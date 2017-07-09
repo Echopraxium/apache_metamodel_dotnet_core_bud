@@ -1,2 +1,0 @@
-﻿Presentation slides of Apache Metamodel 
-http://events.linuxfoundation.org/sites/events/files/slides/Unified%20access%20to%20all%20your%20data%20points.pdf

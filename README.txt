@@ -22,7 +22,12 @@ implementation of interface, like in getComparable() method of BooleanComparator
 
 Anyway, I've tried to do my best (even if my choices may reveal erroneous or even absurd), 
 at least to compile the 'conversion recipes' that I've crafted on the way (they are 
-documented in doc/java2csharp_recipes.txt)
+documented in doc/java2csharp_recipes.txt).
+
+I've also provided a set of 'Helper classes' (under apache_metamodel_dotnet_core/org/
+apache/metamodel/j2cs), like class extensions (e.g. add a GetHashcode() method to the 
+C# 'object' class), type replacement (e.g. Java's Number class converted to 'CsNumber')
+, etc..
 
 Here is the result of my 'J2Cs' (Java To C#) adventures until now. In the hope that it may 
 bring interest for validation and maybe a "child project" Apache MetaModel which is a great 

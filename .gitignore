@@ -1,0 +1,23 @@
+# ignore merge files
+*.orig
+
+# ignore thumbnails created by windows
+Thumbs.db
+
+# vs code and vs files
+.vscode/
+.vs/
+*.user
+*.sln
+
+# dotnet build files
+obj/
+bin/
+
+# eclipse files
+.project
+.classpath
+.settings/
+
+# maven files
+target/

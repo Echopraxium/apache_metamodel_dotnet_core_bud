@@ -1,17 +1,16 @@
 ﻿*****************************************************************************************
-*****************************************************************************************
-                             Java to C# conversion recipes
+                          Java to C# (.Net Core- conversion recipes
 
 Project:                  Porting Apache MetaModel to C# .Net Core
 Author:                   Michel Kern (echopraxium)
 License of this document: Apache 2.0
-*****************************************************************************************
 *****************************************************************************************
 http://www.25hoursaday.com/csharpvsjava.html
 https://www.codeproject.com/Articles/4881/A-Comparative-Study-of-Java-and-C
 https://en.wikipedia.org/wiki/Comparison_of_C_Sharp_and_Java
 
 ** ToDo **
+* Investigate if it is worth using JavApi: https://github.com/RealBastie/JavApi
 * ? Check in ported code if 'IEnumerable' was erroneously used istead of 'IEnumerator'
 * Equals: http://www.aaronstannard.com/overriding-equality-in-dotnet/
 
@@ -35,9 +34,6 @@ https://en.wikipedia.org/wiki/Comparison_of_C_Sharp_and_Java
   C#:   GetElementType() 
         https://bytes.com/topic/c-sharp/answers/231284-getting-underlying-type-array-type
 
-* java: instanceof
-  C#:   is 
-
 * java: o.getClass();
   C#:   o.GetType();
 
@@ -50,19 +46,19 @@ https://en.wikipedia.org/wiki/Comparison_of_C_Sharp_and_Java
 * java: Boolean b;
   C#:   bool    b;
 
-* java: ArrayList<String> items = new ArrayList<String>();
-  C#:   List<String>      items = new List<String>();
+* java: ArrayList
+  C#:   List
 
-* java: Map<String> items = new ArrayList<String>();
-  C#:   Dictionary<string> items = new List<string>();
+* java: Map
+  C#:   Dictionary
   https://stackoverflow.com/questions/687942/java-map-equivalent-in-c-sharp?rq=1
 
-* java: HashMap<String> items = new ArrayList<String>();
-  C#:   Dictionary<string>      items = new List<string>();
+* java: HashMap
+  C#:   Dictionary
   https://stackoverflow.com/questions/1273139/c-sharp-java-hashmap-equivalent
 
-* java: Iterable<String>    items;
-  C#:   IEnumerable<string> items;
+* java: Iterable<T>
+  C#:   IEnumerable<T>
 ---- 1.1.1.  Common conversions
 
 
@@ -207,11 +203,30 @@ https://en.wikipedia.org/wiki/Comparison_of_C_Sharp_and_Java
 
 1.4. Input Output
 -----------------------
+* java: InputStream
+  C#:   NInputStream
+
+* java: OutputStream
+  C#:   NOutputStream
+
+* java: File
+  C#:   use either 'NInputStream', 'NOutputStream', 'FileStream'
+                   'File', 'Path' and 'Directory' depending on Java code semantic
+
+* java: Writer
+  C#:   StreamWriter
+
+* java: AutoCloseable.close()
+  C#:   IDisposable.Dispose()
+
+* java: Reader
+  C#:   StreamReader
+
+* java: BufferedReader
+  C#:   StreamReader  // 'educated guess', I read that ".Net streams are buffered by default"
+
 * java: implements Serializable / extends Serializable
   C#:   ISerializable / : ISerializable
-
-* java: OutputStream InputStream
-  C#:   System.IO.Stream
 ----- end of '1.4. Input Output'
 
 
@@ -225,6 +240,12 @@ https://en.wikipedia.org/wiki/Comparison_of_C_Sharp_and_Java
 
 * java: NumberFormatException
   C#:   FormatException
+
+* java: ResourceException
+  C#:   CsResourceException
+
+* java: InvocationTargetException
+  C#:   TargetInvocationException
 
 * java: // in interface class: 
         return_type method_name() throws ..;
@@ -243,7 +264,6 @@ https://en.wikipedia.org/wiki/Comparison_of_C_Sharp_and_Java
 	    public string getName();
   C#:   // interface service declaration: 
 	    string getName(); // remove 'public' keyword
-
 
 * java: // implement (or extend) 'Serializable'
         public class implements Serializable
@@ -317,16 +337,13 @@ https://en.wikipedia.org/wiki/Comparison_of_C_Sharp_and_Java
 * java:	public static Comparable<Object> getComparable(Object object) {
 		final Boolean b = toBoolean(object);
 		return new Comparable<Object>() {
-
 			    @Override
 			    public boolean equals(Object obj) {
 				    return _instance.equals(obj);
 			    }
-
 			    public int compareTo(Object o) {
 				    return _instance.compare(b, o);
 			    }
-
 			    @Override
 			    public String toString() {
 				    return "BooleanComparable[boolean=" + b + "]";

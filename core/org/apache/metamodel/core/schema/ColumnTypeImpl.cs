@@ -17,12 +17,11 @@
 * under the License.
 */
 // https://github.com/apache/metamodel/blob/master/core/src/main/java/org/apache/metamodel/schema/ColumnTypeImpl.java
-using org.apache.metamodel.j2cs;
-using org.apache.metamodel.j2cs.data.date_time;
-using org.apache.metamodel.j2cs.data.numbers;
-using org.apache.metamodel.j2cs.reflection;
-using org.apache.metamodel.j2cs.slf4j;
-using org.apache.metamodel.j2cs.types;
+using org.apache.metamodel.j2n;
+using org.apache.metamodel.j2n.data.date_time;
+using org.apache.metamodel.j2n.data.numbers;
+using org.apache.metamodel.j2n.reflection;
+using org.apache.metamodel.j2n.slf4j;
 using org.apache.metamodel.util;
 using System;
 using System.Collections.Generic;
@@ -38,7 +37,7 @@ namespace org.apache.metamodel.schema
     public class ColumnTypeImpl : ColumnType
     {
         private static readonly long serialVersionUID = 1L;
-        public  static readonly Logger logger = LoggerFactory.getLogger(typeof(ColumnTypeImpl).Name);
+        public  static readonly NLogger logger = NLoggerFactory.getLogger(typeof(ColumnTypeImpl).Name);
 
         private string            _name;
         private SuperColumnType   _superColumnType;
@@ -156,7 +155,7 @@ namespace org.apache.metamodel.schema
                     string fieldName = field.Name;
                     if (fieldName.Equals(name)) 
                     {
-                        CsInteger value = CsInteger.ZERO;
+                        NInteger value = NInteger.ZERO;
                         field.GetValue(value);
                         return value;
                     }
@@ -256,20 +255,20 @@ namespace org.apache.metamodel.schema
             {
                 type = ColumnTypeDefs.DATE;
             }
-            else if (cls == typeof(CsTime))
+            else if (cls == typeof(NTime))
             {
                 type = ColumnTypeDefs.TIME;
             }
             else if (cls == typeof(Guid)) {
                 type = ColumnTypeDefs.UUID;
             }
-            else if (cls == typeof(CsTimeStamp).GetType()) {
+            else if (cls == typeof(NTimeStamp).GetType()) {
                 type = ColumnTypeDefs.TIMESTAMP;
             }
-            else if (typeof(CsNumber).IsAssignableFrom(cls)) {
+            else if (typeof(NNumber).IsAssignableFrom(cls)) {
                 type = ColumnTypeDefs.NUMBER;
             }
-            else if (typeof(CsDate).IsAssignableFrom(cls))
+            else if (typeof(NDate).IsAssignableFrom(cls))
             {
                 // Date d;
                 type = ColumnTypeDefs.TIMESTAMP;
@@ -308,13 +307,13 @@ namespace org.apache.metamodel.schema
         {
             try
             {
-                FieldInfo column_type_field = TypeUtils.getField(typeof(ColumnType), fieldName);
+                FieldInfo column_type_field = NTypeUtils.getField(typeof(ColumnType), fieldName);
                 if (column_type_field != null) 
                 {
                     // columnTypeField.setAccessible(true);
                     object o = new object();
                     column_type_field.GetValue(o);
-                    ColumnType columnType = CsSystem.Cast(o, typeof(ColumnType));
+                    ColumnType columnType = NSystem.Cast(o, typeof(ColumnType));
                     return (ColumnType) columnType;
                 }
             } 

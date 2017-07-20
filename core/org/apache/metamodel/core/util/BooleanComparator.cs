@@ -17,8 +17,8 @@
 * under the License.
 */
 // https://github.com/apache/metamodel/blob/master/core/src/main/java/org/apache/metamodel/util/BooleanComparator.java
-using org.apache.metamodel.j2cs.data.numbers;
-using org.apache.metamodel.j2cs.slf4j;
+using org.apache.metamodel.j2n.data.numbers;
+using org.apache.metamodel.j2n.slf4j;
 using System;
 using System.Collections.Generic;
 
@@ -29,7 +29,7 @@ namespace org.apache.metamodel.util
      */
     public sealed class BooleanComparator : IComparer<object>
     {
-        private static readonly Logger logger = LoggerFactory.getLogger(typeof(BooleanComparator).Name);
+        private static readonly NLogger logger = NLoggerFactory.getLogger(typeof(BooleanComparator).Name);
 
 	    private static BooleanComparator _instance = new BooleanComparator();
 
@@ -65,9 +65,9 @@ namespace org.apache.metamodel.util
                     return false;
                 }
             }
-            if (o is CsNumber)
+            if (o is NNumber)
             {
-                int i = ((CsNumber)o).asInt();
+                int i = ((NNumber)o).asInt();
                 return i >= 1;
             }
 

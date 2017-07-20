@@ -18,7 +18,7 @@
 */
 // https://github.com/apache/metamodel/blob/b0cfe3aed447769f752743ac1753ebed90adaad2/core/src/main/java/org/apache/metamodel/query/FromItem.java
 using org.apache.metamodel.data;
-using org.apache.metamodel.j2cs.collections;
+using org.apache.metamodel.j2n.collections;
 using org.apache.metamodel.query;
 using org.apache.metamodel.schema;
 using org.apache.metamodel.util;
@@ -394,7 +394,7 @@ namespace org.apache.metamodel.query
         //    return f;
         //} // clone()
 
-        protected override void decorateIdentity(CsList<Object> identifiers)
+        protected override void decorateIdentity(NList<Object> identifiers)
         {
             identifiers.add(_table);
             identifiers.add(_alias);

@@ -21,18 +21,18 @@ using System;
 using org.apache.metamodel.util;
 using System.Collections.Generic;
 using System.Net;
-using org.apache.metamodel.j2cs.data;
-using org.apache.metamodel.j2cs.attributes;
+using org.apache.metamodel.j2n.data;
+using org.apache.metamodel.j2n.attributes;
 using System.Numerics;
-using org.apache.metamodel.j2cs.types;
-using org.apache.metamodel.j2cs.collections;
+using org.apache.metamodel.j2n.types;
+using org.apache.metamodel.j2n.collections;
 
 namespace org.apache.metamodel.schema
 {
     /**
      * Represents the data-type of columns.
     */
-    [CsSerializableAttribute]
+    [NSerializableAttribute]
     public interface ColumnType : HasName //, ISerializable
     {
         // [J2Cs: inherited from HasName, cannot be redeclared]
@@ -81,11 +81,11 @@ namespace org.apache.metamodel.schema
         public static readonly ColumnType CHAR = new ColumnTypeImpl("CHAR", SuperColumnType.LITERAL_TYPE);
         public static readonly ColumnType VARCHAR = new ColumnTypeImpl("VARCHAR", SuperColumnType.LITERAL_TYPE);
         public static readonly ColumnType LONGVARCHAR = new ColumnTypeImpl("LONGVARCHAR", SuperColumnType.LITERAL_TYPE);
-        public static readonly ColumnType CLOB = new ColumnTypeImpl("CLOB", SuperColumnType.LITERAL_TYPE, typeof(CsClob), true);
+        public static readonly ColumnType CLOB = new ColumnTypeImpl("CLOB", SuperColumnType.LITERAL_TYPE, typeof(NClob), true);
         public static readonly ColumnType NCHAR = new ColumnTypeImpl("NCHAR", SuperColumnType.LITERAL_TYPE);
         public static readonly ColumnType NVARCHAR = new ColumnTypeImpl("NVARCHAR", SuperColumnType.LITERAL_TYPE);
         public static readonly ColumnType LONGNVARCHAR = new ColumnTypeImpl("LONGNVARCHAR", SuperColumnType.LITERAL_TYPE);
-        public static readonly ColumnType NCLOB = new ColumnTypeImpl("NCLOB", SuperColumnType.LITERAL_TYPE, typeof(CsClob), true);
+        public static readonly ColumnType NCLOB = new ColumnTypeImpl("NCLOB", SuperColumnType.LITERAL_TYPE, typeof(NClob), true);
 
         /*
          * Numbers
@@ -119,7 +119,7 @@ namespace org.apache.metamodel.schema
         public static readonly ColumnType BINARY = new ColumnTypeImpl("BINARY", SuperColumnType.BINARY_TYPE);
         public static readonly ColumnType VARBINARY = new ColumnTypeImpl("VARBINARY", SuperColumnType.BINARY_TYPE);
         public static readonly ColumnType LONGVARBINARY = new ColumnTypeImpl("LONGVARBINARY", SuperColumnType.BINARY_TYPE);
-        public static readonly ColumnType BLOB = new ColumnTypeImpl("BLOB", SuperColumnType.BINARY_TYPE, typeof(CsClob), true);
+        public static readonly ColumnType BLOB = new ColumnTypeImpl("BLOB", SuperColumnType.BINARY_TYPE, typeof(NClob), true);
 
         /*
          * Other types (as defined in {@link Types}).
@@ -134,12 +134,12 @@ namespace org.apache.metamodel.schema
         public static readonly ColumnType DATALINK = new ColumnTypeImpl("DATALINK", SuperColumnType.OTHER_TYPE);
         public static readonly ColumnType ROWID = new ColumnTypeImpl("ROWID", SuperColumnType.OTHER_TYPE);
         public static readonly ColumnType SQLXML = new ColumnTypeImpl("SQLXML", SuperColumnType.OTHER_TYPE);
-        public static readonly ColumnType INET = new ColumnTypeImpl("INET", SuperColumnType.OTHER_TYPE, typeof(CsList<IPAddress>));
+        public static readonly ColumnType INET = new ColumnTypeImpl("INET", SuperColumnType.OTHER_TYPE, typeof(NList<IPAddress>));
 
         /*
          * Additional types (added by MetaModel for non-JDBC datastores)
          */
-        public static readonly ColumnType LIST = new ColumnTypeImpl("LIST", SuperColumnType.OTHER_TYPE, typeof(CsList<object>));
+        public static readonly ColumnType LIST = new ColumnTypeImpl("LIST", SuperColumnType.OTHER_TYPE, typeof(NList<object>));
         public static readonly ColumnType MAP = new ColumnTypeImpl("MAP", SuperColumnType.OTHER_TYPE, typeof(Dictionary<object, object>));
         public static readonly ColumnType SET = new ColumnTypeImpl("SET", SuperColumnType.OTHER_TYPE, typeof(HashSet<object>));
         public static readonly ColumnType STRING = new ColumnTypeImpl("STRING", SuperColumnType.LITERAL_TYPE);

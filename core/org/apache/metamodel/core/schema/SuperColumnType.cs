@@ -17,8 +17,8 @@
  * under the License.
  */
 // https://github.com/apache/metamodel/blob/master/core/src/main/java/org/apache/metamodel/schema/SuperColumnType.java
-using org.apache.metamodel.j2cs.data;
-using org.apache.metamodel.j2cs.data.numbers;
+using org.apache.metamodel.j2n.data;
+using org.apache.metamodel.j2n.data.numbers;
 using System;
 
 namespace org.apache.metamodel.schema
@@ -33,7 +33,7 @@ namespace org.apache.metamodel.schema
 
         public static readonly SuperColumnType BOOLEAN_TYPE = new SuperColumnType(typeof(bool));
         public static readonly SuperColumnType LITERAL_TYPE = new SuperColumnType(typeof(string));
-        public static readonly SuperColumnType NUMBER_TYPE  = new SuperColumnType(typeof(CsNumber));
+        public static readonly SuperColumnType NUMBER_TYPE  = new SuperColumnType(typeof(NNumber));
         public static readonly SuperColumnType TIME_TYPE    = new SuperColumnType(typeof(DateTime));
         public static readonly SuperColumnType BINARY_TYPE  = new SuperColumnType(typeof(byte[]));
         public static readonly SuperColumnType OTHER_TYPE   = new SuperColumnType(typeof(object));

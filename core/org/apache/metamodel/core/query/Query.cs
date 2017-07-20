@@ -19,12 +19,12 @@
 // https://github.com/apache/metamodel/blob/master/core/src/main/java/org/apache/metamodel/query/Query.java
 using org.apache.metamodel.query;
 using org.apache.metamodel.util;
-using org.apache.metamodel.j2cs.data;
+using org.apache.metamodel.j2n.data;
 using org.apache.metamodel.schema;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using org.apache.metamodel.j2cs.data.numbers;
+using org.apache.metamodel.j2n.data.numbers;
 
 namespace org.apache.metamodel.query
 {
@@ -66,8 +66,8 @@ namespace org.apache.metamodel.query
         //private FilterClause               _havingClause;
         //private OrderByClause              _orderByClause;
 
-        private CsInteger _maxRows;
-        private CsInteger _firstRow;
+        private NInteger _maxRows;
+        private NInteger _firstRow;
 
         //public Query()
         //{
@@ -391,7 +391,7 @@ namespace org.apache.metamodel.query
         //        }
         //        else
         //        {
-        //            //[J2Cs]  LogicalOperator.valueOf() <=> Enum.Parse(typeof(LogicalOperator), value)
+        //            //[J2N]  LogicalOperator.valueOf() <=> Enum.Parse(typeof(LogicalOperator), value)
         //            LogicalOperator logicalOperator = (LogicalOperator)Enum.Parse(typeof(LogicalOperator), delims[1].Trim() );
 
         //            List<FilterItem> filterItems = new List<FilterItem>();
@@ -520,7 +520,7 @@ namespace org.apache.metamodel.query
         //    if (token.StartsWith("'") && token.EndsWith("'") && token.Length > 2)
         //    {
         //        string stringOperand = token.Substring(1, token.Length - 1);
-        //        //[J2Cs] replaceAll <=>  Replace
+        //        //[J2N] replaceAll <=>  Replace
         //        stringOperand = stringOperand.Replace("\\\\'", "'");
         //        return stringOperand;
         //    }
@@ -694,7 +694,7 @@ namespace org.apache.metamodel.query
         //{
         //    if (firstRow != null && firstRow < 1)
         //    {
-        //        //[J2Cs] IllegalArgumentException <=> ArgumentException
+        //        //[J2N] IllegalArgumentException <=> ArgumentException
         //        throw new ArgumentException("First row cannot be negative or zero");
         //    }
         //    _firstRow = firstRow;

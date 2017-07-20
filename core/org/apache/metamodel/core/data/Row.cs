@@ -17,8 +17,8 @@
 * under the License.
 */
 // https://github.com/apache/metamodel/blob/master/core/src/main/java/org/apache/metamodel/data/Row.java
-using org.apache.metamodel.j2cs.attributes;
-using org.apache.metamodel.j2cs.types;
+using org.apache.metamodel.j2n.attributes;
+using org.apache.metamodel.j2n.types;
 using org.apache.metamodel.query;
 using org.apache.metamodel.schema;
 
@@ -31,7 +31,7 @@ namespace org.apache.metamodel.data
      * @see DataSet
      * @see SelectItem
      */
-    [CsSerializableAttribute]
+    [NSerializableAttribute]
     public interface Row // : ISerializable
     {
         /**

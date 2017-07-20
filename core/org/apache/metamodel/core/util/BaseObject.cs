@@ -17,44 +17,25 @@
 * under the License.
 */
 // https://github.com/apache/metamodel/blob/master/core/src/main/java/org/apache/metamodel/util/BaseObject.java
-using org.apache.metamodel.j2cs;
-using org.apache.metamodel.j2cs.collections;
-using org.apache.metamodel.j2cs.data.numbers;
-using org.apache.metamodel.j2cs.slf4j;
-using org.apache.metamodel.j2cs.types;
+using org.apache.metamodel.j2n;
+using org.apache.metamodel.j2n.collections;
+using org.apache.metamodel.j2n.data.numbers;
+using org.apache.metamodel.j2n.slf4j;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-/**
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements.  See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership.  The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License.  You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+
 namespace org.apache.metamodel.util
 {
     public abstract class BaseObject : object
     {
-        private static readonly Logger logger = LoggerFactory.getLogger(typeof(BaseObject).Name);
+        private static readonly NLogger logger = NLoggerFactory.getLogger(typeof(BaseObject).Name);
 
         public override string ToString()
         {
             // overridden version of toString() method that uses identity hash code
             // (to prevent hashCode() recursion due to logging!)
             return GetType().Name + "@"
-                  + CsInteger.ToHexString(CsSystem.IdentityHashCode(this)); // Integer.toHexString(System.identityHashCode(this));
+                  + NInteger.ToHexString(NSystem.IdentityHashCode(this)); // Integer.toHexString(System.identityHashCode(this));
         } // ToString()
 
         /**
@@ -64,9 +45,9 @@ namespace org.apache.metamodel.util
         {
             logger.debug("{}.hashCode()", this);
             int hash_code = -1;
-            CsList<object> list = new CsList<object>();
+            NList<object> list = new NList<object>();
             decorateIdentity(list);
-            if (EnumerableUtils.IsEmpty<object>(list))
+            if (NEnumerableUtils.IsEmpty<object>(list))
             {
                 list.Add(ToString());
             }
@@ -142,8 +123,8 @@ namespace org.apache.metamodel.util
                 BaseObject that = (BaseObject) obj;
                 if (classEquals(that))
                 {
-                    CsList<object> list1 = new CsList<object>();
-                    CsList<object> list2 = new CsList<object>();
+                    NList<object> list1 = new NList<object>();
+                    NList<object> list2 = new NList<object>();
 
                     decorateIdentity(list1);
                     that.decorateIdentity(list2);
@@ -155,9 +136,9 @@ namespace org.apache.metamodel.util
                                                             + ") returned different size decorated identity lists");
                     }
 
-                    if (EnumerableUtils.IsEmpty<object>(list1))
+                    if (NEnumerableUtils.IsEmpty<object>(list1))
                     {
-                        Debug.Assert(EnumerableUtils.IsEmpty<object>(list2));
+                        Debug.Assert(NEnumerableUtils.IsEmpty<object>(list2));
 
                         list1.Add(ToString());
                         list2.Add(that.ToString());
@@ -186,6 +167,6 @@ namespace org.apache.metamodel.util
          * 
          * @param identifiers
          */
-        protected abstract void decorateIdentity(CsList<object> identifiers);
+        protected abstract void decorateIdentity(NList<object> identifiers);
     } // BaseObject class
 } // org.apache.metamodel.util namespace

@@ -17,11 +17,10 @@
  * under the License.
  */
 // https://github.com/apache/metamodel/blob/b0cfe3aed447769f752743ac1753ebed90adaad2/core/src/main/java/org/apache/metamodel/util/TimeComparator.java
-using org.apache.metamodel.j2cs.data.date_time;
-using org.apache.metamodel.j2cs.data.numbers;
-using org.apache.metamodel.j2cs.exceptions;
-using org.apache.metamodel.j2cs.slf4j;
-using org.apache.metamodel.j2cs.types;
+using org.apache.metamodel.j2n.data.date_time;
+using org.apache.metamodel.j2n.data.numbers;
+using org.apache.metamodel.j2n.exceptions;
+using org.apache.metamodel.j2n.slf4j;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -35,7 +34,7 @@ namespace org.apache.metamodel.util
      */
     public sealed class TimeComparator : IComparer<Object>
     {
-        private static readonly Logger logger = LoggerFactory.getLogger(typeof(TimeComparator).Name);
+        private static readonly NLogger logger = NLoggerFactory.getLogger(typeof(TimeComparator).Name);
 
         private static readonly String[] prototypePatterns = 
                                          { "yyyy-MM-dd HH:mm:ss.SSS", "yyyy-MM-dd HH:mm:ss",
@@ -54,13 +53,13 @@ namespace org.apache.metamodel.util
         {
         }
 
-        //[J2Cs] Implementation helper class which replaces the anonymous interface implementation class in Java
+        //[J2N] Implementation helper class which replaces the anonymous interface implementation class in Java
         private class _Time_Comparable_Impl_ : IComparable<object>
         {
-            private CsDate _dt1_;
+            private NDate _dt1_;
             private IComparer<object> _instance_;
 
-            public _Time_Comparable_Impl_(IComparer<object> instance_arg, CsDate dt1_arg)
+            public _Time_Comparable_Impl_(IComparer<object> instance_arg, NDate dt1_arg)
             {
                 _dt1_      = dt1_arg;
                 _instance_ = instance_arg;
@@ -84,7 +83,7 @@ namespace org.apache.metamodel.util
 
         public static IComparable<object> getComparable(object o)
         {
-            CsDate dt1 = toDate(o);
+            NDate dt1 = toDate(o);
             return new _Time_Comparable_Impl_(_instance, dt1);
         } // getComparable()
 
@@ -104,39 +103,39 @@ namespace org.apache.metamodel.util
                 }
                 try
                 {
-                    CsDate dt1 = toDate(o1);
-                    CsDate dt2 = toDate(o2);
-                    return CsDate.CompareTo(dt1, dt2);
+                    NDate dt1 = toDate(o1);
+                    NDate dt2 = toDate(o2);
+                    return NDate.CompareTo(dt1, dt2);
                 }
                 catch (Exception e)
                 {
                     logger.error("Could not compare {} and {}", o1, o2);
-                    throw new CsSystemException(e.Message);
+                    throw new NSystemException(e.Message);
                 }
         } // Compare()
 
-        public static CsDate toDate(object value)
+        public static NDate toDate(object value)
         {
-            CsDate result = null;
+            NDate result = null;
             if (value == null)
             {
                 result = null;
             }
-            else if (value is CsDate) {
-                result = (CsDate)value;
+            else if (value is NDate) {
+                result = (NDate)value;
             }
             else if (value is Calendar)
             {
                 // https://www.tutorialspoint.com/java/util/calendar_gettime.htm
-                result = new CsDate(DateTime.Now);
+                result = new NDate(DateTime.Now);
             }
             else if (value is String)
             {
                 result = convertFromString((String)value);
             }
-            else if (value is CsNumber)
+            else if (value is NNumber)
             {
-                result = convertFromNumber((CsNumber)value);
+                result = convertFromNumber((NNumber)value);
             }
 
             if (result == null)
@@ -149,18 +148,18 @@ namespace org.apache.metamodel.util
 
         public static bool isTimeBased(object o)
         {
-            if (o is CsDate || o is Calendar) {
+            if (o is NDate || o is Calendar) {
                 return true;
             }
             return false;
         }
 
-    private static CsDate convertFromString(String value)
+    private static NDate convertFromString(String value)
     {
         try
         {
             long long_value = long.Parse(value);
-            return convertFromNumber(new CsNumber(long_value));
+            return convertFromNumber(new NNumber(long_value));
         }
         //catch (NumberFormatException e)
         #pragma warning disable 0168
@@ -181,9 +180,9 @@ namespace org.apache.metamodel.util
             dtfi.LongTimePattern = "EEE MMM dd HH:mm:ss zzz yyyy";
             //SimpleDateFormat   dateFormat  = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", dtfi);
             //return dateFormat.parse(value);
-            return new CsDate(DateTime.ParseExact(value, "T", dtfi));
+            return new NDate(DateTime.ParseExact(value, "T", dtfi));
         }
-        catch (CsParseException e)
+        catch (NParseException e)
         {
             // do noting
         }
@@ -195,8 +194,8 @@ namespace org.apache.metamodel.util
                 DateTimeFormatInfo dtfi;
                 try
                 {
-                    dtfi = CsDateUtils.createDateFormat(prototype_pattern);
-                    return new CsDate(value, prototype_pattern, dtfi); //  dateFormat.parse(value);
+                    dtfi = NDateUtils.createDateFormat(prototype_pattern);
+                    return new NDate(value, prototype_pattern, dtfi); //  dateFormat.parse(value);
                 }
                 catch (Exception e)
                 {
@@ -208,8 +207,8 @@ namespace org.apache.metamodel.util
                     // try with '.' in stead of '-'
                     try
                     {
-                        dtfi = CsDateUtils.createDateFormat(prototype_pattern.Replace("\\-", "\\."));
-                        return new CsDate(value, prototype_pattern, dtfi); //dateFormat.parse(value);
+                        dtfi = NDateUtils.createDateFormat(prototype_pattern.Replace("\\-", "\\."));
+                        return new NDate(value, prototype_pattern, dtfi); //dateFormat.parse(value);
                     }
                     catch (Exception e)
                     {
@@ -219,8 +218,8 @@ namespace org.apache.metamodel.util
                     // try with '/' in stead of '-'
                     try
                     {
-                        dtfi = CsDateUtils.createDateFormat(prototype_pattern.Replace("\\-", "\\/"));
-                        return new CsDate(value, prototype_pattern, dtfi); // dateFormat.parse(value);
+                        dtfi = NDateUtils.createDateFormat(prototype_pattern.Replace("\\-", "\\/"));
+                        return new NDate(value, prototype_pattern, dtfi); // dateFormat.parse(value);
                     }
                     catch (Exception e)
                     {
@@ -232,12 +231,12 @@ namespace org.apache.metamodel.util
         return null;
     } // convertFromString()
 
-    private static CsDate convertFromNumber(CsNumber value)
+    private static NDate convertFromNumber(NNumber value)
     {
-        CsNumber numberValue  = (CsNumber)value;
+        NNumber numberValue  = (NNumber)value;
         long     long_value   = numberValue.asLong();
 
-        CsNumber n            = new CsNumber(long_value);
+        NNumber n            = new NNumber(long_value);
         String   string_value = n.ToString();
         // test if the number is actually a format of the type yyyyMMdd
         if (string_value.Length == 8 && (string_value.StartsWith("1") || string_value.StartsWith("2")))
@@ -245,8 +244,8 @@ namespace org.apache.metamodel.util
             try
             {
                 string format = "yyyyMMdd";
-                DateTimeFormatInfo dtfi = CsDateUtils.createDateFormat(format);
-                return new CsDate(string_value, format, dtfi);
+                DateTimeFormatInfo dtfi = NDateUtils.createDateFormat(format);
+                return new NDate(string_value, format, dtfi);
             }
             catch (Exception e)
             {
@@ -260,8 +259,8 @@ namespace org.apache.metamodel.util
             try
             {
                 string format = "yyMMdd";
-                DateTimeFormatInfo dtfi = CsDateUtils.createDateFormat(format);
-                return new CsDate(string_value, format, dtfi);
+                DateTimeFormatInfo dtfi = NDateUtils.createDateFormat(format);
+                return new NDate(string_value, format, dtfi);
             }
             #pragma warning disable 0168
             catch (Exception e)
@@ -275,14 +274,14 @@ namespace org.apache.metamodel.util
             {
                 // Java: this number is most probably amount of milliseconds since 1970
                 // C#:   this number is most probably amount of milliseconds since 1900
-                CsDate d = new CsDate(DateTime.Now);
-                return new CsDate(long_value);
+                NDate d = new NDate(DateTime.Now);
+                return new NDate(long_value);
             }
             else
             {
                 // Java: this number is most probably amount of milliseconds since 1970
                 // C#:   this number is most probably amount of milliseconds since 1900
-                return new CsDate(long_value * 1000 * 60 * 60 * 24);
+                return new NDate(long_value * 1000 * 60 * 60 * 24);
             }
     } // convertFromNumber()
     } // TimeComparaorClass

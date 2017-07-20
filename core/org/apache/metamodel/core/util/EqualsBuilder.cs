@@ -17,7 +17,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-using org.apache.metamodel.j2cs.slf4j;
+using org.apache.metamodel.j2n.slf4j;
 using System;
 
 namespace org.apache.metamodel.util
@@ -27,7 +27,7 @@ namespace org.apache.metamodel.util
      */
     public sealed class EqualsBuilder
     {
-        private static readonly Logger logger = LoggerFactory.getLogger(typeof(EqualsBuilder).Name);
+        private static readonly NLogger logger = NLoggerFactory.getLogger(typeof(EqualsBuilder).Name);
 	    private bool _equals = true;
 
         public EqualsBuilder append(bool b)

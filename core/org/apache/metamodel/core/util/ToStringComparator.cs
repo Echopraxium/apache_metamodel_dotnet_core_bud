@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-using org.apache.metamodel.j2cs.types;
+using org.apache.metamodel.j2n.types;
 using System;
 using System.Collections.Generic;
 
@@ -55,7 +55,7 @@ namespace org.apache.metamodel.util
             return o1.ToString().CompareTo(o2.ToString());
         } // Compare()
 
-        //[J2Cs] Implementation helper class which replaces the anonymous interface implementation class in Java
+        //[J2N] Implementation helper class which replaces the anonymous interface implementation class in Java
         private class _String_Comparer_Impl_ : IComparable<object>
         {
             private String              _s_;

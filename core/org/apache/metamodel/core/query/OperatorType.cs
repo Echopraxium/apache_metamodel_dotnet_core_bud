@@ -17,7 +17,7 @@
 * under the License.
 */
 // https://github.com/apache/metamodel/blob/b0cfe3aed447769f752743ac1753ebed90adaad2/core/src/main/java/org/apache/metamodel/query/OperatorType.java
-using org.apache.metamodel.j2cs.attributes;
+using org.apache.metamodel.j2n.attributes;
 using System;
 
 namespace org.apache.metamodel.query
@@ -27,7 +27,7 @@ namespace org.apache.metamodel.query
      *
      * @see FilterItem
      */
-    [CsSerializableAttribute]
+    [NSerializableAttribute]
     public abstract class OperatorType //: ISerializable
     {
 

@@ -17,10 +17,10 @@
 * under the License.
 */
 // https://github.com/apache/metamodel/blob/b0cfe3aed447769f752743ac1753ebed90adaad2/core/src/main/java/org/apache/metamodel/util/NumberComparator.java
-using org.apache.metamodel.j2cs.data;
-using org.apache.metamodel.j2cs.data.numbers;
-using org.apache.metamodel.j2cs.slf4j;
-using org.apache.metamodel.j2cs.types;
+using org.apache.metamodel.j2n.data;
+using org.apache.metamodel.j2n.data.numbers;
+using org.apache.metamodel.j2n.slf4j;
+using org.apache.metamodel.j2n.types;
 using System;
 using System.Collections.Generic;
 
@@ -33,7 +33,7 @@ namespace org.apache.metamodel.util
     public sealed class NumberComparator : IComparer<object>
     {
 
-        private static readonly Logger logger = LoggerFactory.getLogger(typeof(NumberComparator).Name);
+        private static readonly NLogger logger = NLoggerFactory.getLogger(typeof(NumberComparator).Name);
 
         private static readonly IComparer<object> _instance = new NumberComparator();
 
@@ -46,13 +46,13 @@ namespace org.apache.metamodel.util
         {
         }
 
-        //[J2Cs] Implementation helper class which replaces the anonymous interface implementation class in Java
+        //[J2N] Implementation helper class which replaces the anonymous interface implementation class in Java
         private class _Number_Comparable_Impl_ : IComparable<object>
         {
-            private CsNumber _value_;
+            private NNumber _value_;
             private IComparer<object> _instance_;
 
-            public _Number_Comparable_Impl_(IComparer<object> instance_arg, CsNumber value_arg)
+            public _Number_Comparable_Impl_(IComparer<object> instance_arg, NNumber value_arg)
             {
                 _value_ = value_arg;
                 _instance_ = instance_arg;
@@ -76,15 +76,15 @@ namespace org.apache.metamodel.util
 
         public static IComparable<object> getComparable(object o)
         {
-            CsNumber n = toNumber(o);
+            NNumber n = toNumber(o);
             return new _Number_Comparable_Impl_(_instance, n);
         } // getComparable()
 
 
         public int Compare(object o1, object o2)
         {
-            CsNumber n1 = toNumber(o1);
-            CsNumber n2 = toNumber(o2);
+            NNumber n1 = toNumber(o1);
+            NNumber n2 = toNumber(o2);
 
             if (n1 == null && n2 == null)
             {
@@ -99,7 +99,7 @@ namespace org.apache.metamodel.util
                 return 1;
             }
 
-            if (n1 is CsNumber && n2 is CsNumber)
+            if (n1 is NNumber && n2 is NNumber)
             {
                 return (n1.asBigInteger()).CompareTo(n2.asBigInteger());
             }
@@ -110,10 +110,10 @@ namespace org.apache.metamodel.util
 
             if (NumberComparator.IsIntegerType(n1) && NumberComparator.IsIntegerType(n2))
             {
-                return CsInteger.ValueOf(n1).CompareTo(n2.asLong());
+                return NInteger.ValueOf(n1).CompareTo(n2.asLong());
             }
 
-            return CsNumber.ValueOf(n1).CompareTo(n2.asLong());
+            return NNumber.ValueOf(n1).CompareTo(n2.asLong());
         } // Compare()
 
         /**
@@ -127,12 +127,12 @@ namespace org.apache.metamodel.util
          * @param n
          * @return
          */
-        public static bool IsIntegerType(CsNumber n)
+        public static bool IsIntegerType(NNumber n)
         {
-            return n is CsInteger || n is CsAtomicInteger || n is CsAtomicLong;
+            return n is NInteger || n is NAtomicInteger || n is NAtomicLong;
         } // isIntegerType()
 
-        public static CsNumber toNumber(object value)
+        public static NNumber toNumber(object value)
         {
             String string_value;
 
@@ -140,19 +140,19 @@ namespace org.apache.metamodel.util
             {
                 return null;
             }
-            else if (value is CsNumber)
+            else if (value is NNumber)
             {
-                return (CsNumber)value;
+                return (NNumber)value;
             }
-            else if (value is CsBool)
+            else if (value is NBool)
             {
                 if (bool.TrueString.Equals(value.ToString()))
                 {
-                    return CsInteger.ONE;
+                    return NInteger.ONE;
                 }
                 else
                 {
-                    return CsInteger.ZERO;
+                    return NInteger.ZERO;
                 }
             }
             else
@@ -165,21 +165,21 @@ namespace org.apache.metamodel.util
 
                 try
                 {
-                    return new CsNumber(CsNumber.ParseInt(string_value));
+                    return new NNumber(NNumber.ParseInt(string_value));
                 }
                 catch (FormatException e)
                 {
                 }
                 try
                 {
-                    return CsNumber.ParseLong(string_value);
+                    return NNumber.ParseLong(string_value);
                 }
                 catch (FormatException e)
                 {
                 }
                 try
                 {
-                    return new CsNumber(CsNumber.ParseDouble(string_value));
+                    return new NNumber(NNumber.ParseDouble(string_value));
                 }
                 catch (FormatException e)
                 {
@@ -192,11 +192,11 @@ namespace org.apache.metamodel.util
             {
                 if ("true".Equals(string_value, StringComparison.CurrentCultureIgnoreCase))
                 {
-                    return CsInteger.ONE;
+                    return NInteger.ONE;
                 }
                 if ("false".Equals(string_value, StringComparison.CurrentCultureIgnoreCase))
                 {
-                    return CsInteger.ZERO;
+                    return NInteger.ZERO;
                 }
             }
             logger.warn("Could not convert '{}' to number, returning null", value);

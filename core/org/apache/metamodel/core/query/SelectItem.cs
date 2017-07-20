@@ -21,8 +21,9 @@ using org.apache.metamodel.util;
 using org.apache.metamodel.schema;
 using System;
 using System.Text;
-using org.apache.metamodel.j2cs.collections;
-using org.apache.metamodel.j2cs.slf4j;
+using org.apache.metamodel.j2n.collections;
+using org.apache.metamodel.j2n.slf4j;
+using org.apache.metamodel.j2n.collections;
 
 namespace org.apache.metamodel.query
 {
@@ -46,15 +47,15 @@ namespace org.apache.metamodel.query
         public static readonly string  FUNCTION_APPROXIMATION_PREFIX = "APPROXIMATE ";
 
         private static readonly long   serialVersionUID = 317475105509663973L;
-        private static readonly Logger logger           = LoggerFactory.getLogger(typeof(SelectItem).Name);
+        private static readonly NLogger logger           = NLoggerFactory.getLogger(typeof(SelectItem).Name);
 
         // immutable fields (essense)
-        private readonly Column         _column;
-        private readonly FunctionType   _function;
-        private readonly object[]       _functionParameters;
-        private readonly string         _expression;
-        private readonly SelectItem     _subQuerySelectItem;
-        private readonly FromItem       _fromItem;
+        private readonly Column        _column;
+        private readonly FunctionType _function;
+        private readonly object[]      _functionParameters;
+        private readonly string        _expression;
+        private readonly SelectItem    _subQuerySelectItem;
+        private readonly FromItem      _fromItem;
 
         // mutable fields (tweaking)
         private bool   _functionApproximationAllowed;
@@ -103,7 +104,7 @@ namespace org.apache.metamodel.query
          * @param function
          * @param column
          */
-        public SelectItem(FunctionType function, Column column) : this(function, column, null)
+        public SelectItem(FunctionType function_type, Column column) : this(function_type, column, null)
         { } // constructor
 
         /**
@@ -113,8 +114,8 @@ namespace org.apache.metamodel.query
          * @param functionParameters
          * @param column
          */
-        public SelectItem(FunctionType function, object[] functionParameters, Column column) :
-                          this(function, functionParameters, column, null)
+        public SelectItem(FunctionType function_type, object[] functionParameters, Column column) :
+                          this(function_type, functionParameters, column, null)
         {  
         } // constructor
 
@@ -151,8 +152,8 @@ namespace org.apache.metamodel.query
          * @param column
          * @param fromItem
          */
-        public SelectItem(FunctionType function, Column column, FromItem fromItem) :
-                          this(column, fromItem, function, null, null, null, null, false)
+        public SelectItem(FunctionType function_type, Column column, FromItem fromItem) :
+                          this(column, fromItem, function_type, null, null, null, null, false)
         {
              if (column == null)
              {
@@ -170,8 +171,8 @@ namespace org.apache.metamodel.query
          * @param column
          * @param fromItem
          */
-        public SelectItem(FunctionType function, object[] functionParameters, Column column, FromItem fromItem) :
-                          this(column, fromItem, function, functionParameters, null, null, null, false)
+        public SelectItem(FunctionType function_type, object[] functionParameters, Column column, FromItem fromItem) :
+                          this(column, fromItem, function_type, functionParameters, null, null, null, false)
         {
             if (column == null)
             {
@@ -186,7 +187,8 @@ namespace org.apache.metamodel.query
          * @param expression
          * @param alias
          */
-        public SelectItem(string expression, string alias): this(null, expression, alias)
+        public SelectItem(string expression, string alias): 
+                          this(null, expression, alias)
         {
         } // constructor
 
@@ -198,8 +200,8 @@ namespace org.apache.metamodel.query
          * @param expression
          * @param alias
          */
-        public SelectItem(FunctionType function, string expression, string alias):
-                      this(null, null, function, null, expression, null, alias, false)
+        public SelectItem(FunctionType function_type, string expression, string alias):
+                          this(null, null, function_type, null, expression, null, alias, false)
         {
             if (expression == null)
             {
@@ -234,7 +236,7 @@ namespace org.apache.metamodel.query
          * 
          * @param identifiers
         */
-        protected override void decorateIdentity(CsList<Object> identifiers)
+        protected override void decorateIdentity(NList<Object> identifiers)
         {
             identifiers.add(_expression);
             identifiers.add(_alias);
@@ -260,7 +262,8 @@ namespace org.apache.metamodel.query
          */
         public static SelectItem getCountAllItem()
         {
-            return new SelectItem(FunctionTypeDefs.COUNT, "*", null);
+            object[] values = { "*" };
+            return new SelectItem(FunctionTypeExt.COUNT, values, null);
         } // getCountAllItem()
 
         public static bool isCountAllItem(SelectItem item)
@@ -283,7 +286,7 @@ namespace org.apache.metamodel.query
         {
             _alias = alias;
             return this;
-        }
+        } // setAlias()
 
         /**
          * 
@@ -298,7 +301,7 @@ namespace org.apache.metamodel.query
         public FunctionType getFunction()
         {
             return _function;
-        }
+        } // getFunction()
 
         public bool hasFunction()
         {
@@ -394,23 +397,23 @@ namespace org.apache.metamodel.query
         public string getExpression()
         {
             return _expression;
-        }
+        } // getExpression()
 
         public SelectItem setQuery(Query query)
         {
             _query = query;
             return this;
-        }
+        } // setQuery()
 
         public Query getQuery()
         {
             return _query;
-        }
+        } // getQuery()
 
         public SelectItem getSubQuerySelectItem()
         {
             return _subQuerySelectItem;
-        }
+        } // getSubQuerySelectItem()
 
         /**
          * @deprecated use {@link #getFromItem()} instead
@@ -419,7 +422,7 @@ namespace org.apache.metamodel.query
         public FromItem getSubQueryFromItem()
         {
             return _fromItem;
-        }
+        } // getSubQueryFromItem()
 
         public FromItem getFromItem()
         {
@@ -592,6 +595,11 @@ namespace org.apache.metamodel.query
             }
             return sb;
         } // toStringNoAlias()
+
+        internal SelectItem clone()
+        {
+            throw new NotImplementedException();
+        }
 
         //[J2Cs: Stub ]
         private string getToStringColumnPrefix(bool includeSchemaInColumnPath)

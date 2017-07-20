@@ -17,7 +17,7 @@
 * under the License.
 */
 // https://github.com/apache/metamodel/blob/master/core/src/main/java/org/apache/metamodel/util/CollectionUtils.java
-using org.apache.metamodel.j2cs.collections;
+using org.apache.metamodel.j2n.collections;
 using System.Collections.Generic;
 
 namespace org.apache.metamodel.util
@@ -31,7 +31,7 @@ namespace org.apache.metamodel.util
 
         public static List<E> filter <E, SuperE> (E[] items, Predicate<SuperE> predicate) where E: SuperE
         {
-            return filter(Arrays.asList(items), predicate);
+            return filter(NArrays.asList(items), predicate);
         } // filter()
 
         public static List<E> filter<E, SuperE>(IEnumerable<E> items, Predicate<SuperE> predicate) where E : SuperE
@@ -50,7 +50,7 @@ namespace org.apache.metamodel.util
 
         public static List<O> map <I, SuperI, O> (I[] items, Func<SuperI, O> func) where I : SuperI
         {
-            return map(Arrays.asList(items), func);
+            return map(NArrays.asList(items), func);
         } // map()
 
         public static List<O> map <I, SuperI, O> (IEnumerable<I> items, Func<SuperI, O> func) where I : SuperI

@@ -17,9 +17,9 @@
 * under the License.
 */
 // https://github.com/apache/metamodel/blob/master/core/src/main/java/org/apache/metamodel/data/Style.java
-using org.apache.metamodel.j2cs.attributes;
-using org.apache.metamodel.j2cs.data;
-using org.apache.metamodel.j2cs.data.numbers;
+using org.apache.metamodel.j2n.attributes;
+using org.apache.metamodel.j2n.data;
+using org.apache.metamodel.j2n.data.numbers;
 
 namespace org.apache.metamodel.data
 {
@@ -34,7 +34,7 @@ namespace org.apache.metamodel.data
      * Creation of {@link Style} objects is handled by the {@link StyleBuilder}
      * class.
      */
-    [CsSerializableAttribute]
+    [NSerializableAttribute]
     public interface Style // : ISerializable
     {
         /**
@@ -65,7 +65,7 @@ namespace org.apache.metamodel.data
          * 
          * @return an Integer, or null
          */
-        CsInteger getFontSize();
+        NInteger getFontSize();
 
         /**
          * Gets the unit of the font size.
@@ -119,7 +119,7 @@ namespace org.apache.metamodel.data
      * Creation of {@link Color} objects is handled by the static
      * {@link StyleBuilder}.createColor(...) methods.
     */
-    [CsSerializableAttribute]
+    [NSerializableAttribute]
     public interface Color // : ISerializable
     {
         short getRed();

@@ -17,8 +17,9 @@
 * under the License.
 */
 // https://github.com/apache/metamodel/blob/master/core/src/main/java/org/apache/metamodel/data/StyleImpl.java
-using org.apache.metamodel.j2cs.collections;
-using org.apache.metamodel.j2cs.data.numbers;
+using org.apache.metamodel.j2n.collections;
+using org.apache.metamodel.j2n.data.numbers;
+using org.apache.metamodel.j2n.collections;
 using org.apache.metamodel.util;
 using System;
 using System.Text;
@@ -35,7 +36,7 @@ namespace org.apache.metamodel.data
         private bool           _underline;
         private bool           _italic;
         private bool           _bold;
-        private CsInteger      _fontSize;
+        private NInteger      _fontSize;
         private TextAlignment  _alignment;
         private Color          _backgroundColor;
         private Color          _foregroundColor;
@@ -45,7 +46,7 @@ namespace org.apache.metamodel.data
         {
         } // constructor
 
-        public StyleImpl(bool bold, bool italic, bool underline, CsInteger fontSize, SizeUnit fontSizeUnit,
+        public StyleImpl(bool bold, bool italic, bool underline, NInteger fontSize, SizeUnit fontSizeUnit,
                          TextAlignment alignment, Color backgroundColor, Color foregroundColor)
         {
             _bold = bold;
@@ -73,7 +74,7 @@ namespace org.apache.metamodel.data
             return _underline;
         } //  isUnderline()
 
-        public CsInteger getFontSize()
+        public NInteger getFontSize()
         {
             return _fontSize;
         } // getFontSize()
@@ -174,7 +175,7 @@ namespace org.apache.metamodel.data
             }
         }
 
-        protected override void decorateIdentity( CsList<object> identifiers)
+        protected override void decorateIdentity( NList<object> identifiers)
         {
             identifiers.Add(_underline);
             identifiers.Add(_italic);

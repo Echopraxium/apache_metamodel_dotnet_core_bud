@@ -18,8 +18,8 @@
  */
 // https://github.com/apache/metamodel/blob/master/core/src/main/java/org/apache/metamodel/util/ObjectComparator.java
 
-using org.apache.metamodel.j2cs.data.numbers;
-using org.apache.metamodel.j2cs.slf4j;
+using org.apache.metamodel.j2n.data.numbers;
+using org.apache.metamodel.j2n.slf4j;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -33,7 +33,7 @@ namespace org.apache.metamodel.util
      */
     public sealed class ObjectComparator : IComparer<Object>
     {
-        private static readonly Logger logger = LoggerFactory.getLogger(typeof(ObjectComparator).Name);
+        private static readonly NLogger logger = NLoggerFactory.getLogger(typeof(ObjectComparator).Name);
 
         private static readonly IComparer<Object> _instance = new ObjectComparator();
 
@@ -97,7 +97,7 @@ namespace org.apache.metamodel.util
             {
                 return 1;
             }
-            if (o1 is CsNumber && o1 is CsNumber)
+            if (o1 is NNumber && o1 is NNumber)
             {
                 return NumberComparator.getComparator().Compare(o1, o2);
             }

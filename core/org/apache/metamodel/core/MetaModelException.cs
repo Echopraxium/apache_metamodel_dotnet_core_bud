@@ -28,7 +28,7 @@ namespace org.apache.metamodel
     * framework. Typically these will occur if you have put together a query that
     * is not meaningful or if there is a structural problem in a schema.
     */
-    //[J2Cs]  RuntimeException <=>  SystemException
+    //[J2N]  RuntimeException <=>  SystemException
     public class MetaModelException : Exception  // RuntimeException
     {
         // Disable warnings for unused or unassigned fields

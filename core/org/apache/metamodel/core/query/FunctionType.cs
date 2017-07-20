@@ -17,7 +17,8 @@
 * under the License.
 */
 // https://github.com/apache/metamodel/blob/master/core/src/main/java/org/apache/metamodel/query/FunctionType.java
-using org.apache.metamodel.j2cs.attributes;
+using System;
+using org.apache.metamodel.j2n.attributes;
 using org.apache.metamodel.schema;
 
 namespace org.apache.metamodel.query
@@ -27,7 +28,7 @@ namespace org.apache.metamodel.query
      *
      * @see SelectItem
      */
-    [CsSerializableAttribute]
+    [NSerializableAttribute]
     public interface FunctionType // : ISerializable
     {
         ColumnType getExpectedColumnType(ColumnType type);
@@ -38,21 +39,24 @@ namespace org.apache.metamodel.query
         //}
     } // FunctionType class
 
-    public class FunctionTypeDefs
+    public abstract class FunctionTypeExt : FunctionType
     {
         //[J2Cs: missing dependency; comment out]
-        public static readonly AggregateFunction COUNT;   // = new CountAggregateFunction();
-        public static readonly AggregateFunction AVG;     // = new AverageAggregateFunction();
-        public static readonly AggregateFunction SUM;     // = new SumAggregateFunction();
-        public static readonly AggregateFunction MAX;     // =     = new MaxAggregateFunction();
-        public static readonly AggregateFunction MIN;     // =   = new MinAggregateFunction();
-        public static readonly AggregateFunction RANDOM;  // =   = new RandomAggregateFunction();
-        public static readonly AggregateFunction FIRST;   // =   = new FirstAggregateFunction();
-        public static readonly AggregateFunction LAST;    // =   = new LastAggregateFunction();
-        public static readonly ScalarFunction TO_string;  // == new ToStringFunction();
-        public static readonly ScalarFunction TO_NUMBER;  // = = new ToNumberFunction();
-        public static readonly ScalarFunction TO_DATE;    // = = new ToDateFunction();
-        public static readonly ScalarFunction TO_BOOLEAN; // = = new ToBooleanFunction();
-        public static readonly ScalarFunction MAP_VALUE;  // = = new MapValueFunction();
-    } // FunctionTypeDefs class
+        public static readonly AggregateFunction COUNT;      // = new CountAggregateFunction();
+        public static readonly AggregateFunction AVG;        // = new AverageAggregateFunction();
+        public static readonly AggregateFunction SUM;        // = new SumAggregateFunction();
+        public static readonly AggregateFunction MAX;        // =     = new MaxAggregateFunction();
+        public static readonly AggregateFunction MIN;        // =   = new MinAggregateFunction();
+        public static readonly AggregateFunction RANDOM;     // =   = new RandomAggregateFunction();
+        public static readonly AggregateFunction FIRST;      // =   = new FirstAggregateFunction();
+        public static readonly AggregateFunction LAST;       // =   = new LastAggregateFunction();
+        public static readonly ScalarFunction    TO_STRING;  // == new ToStringFunction();
+        public static readonly ScalarFunction    TO_NUMBER;  // = = new ToNumberFunction();
+        public static readonly ScalarFunction    TO_DATE;    // = = new ToDateFunction();
+        public static readonly ScalarFunction    TO_BOOLEAN; // = = new ToBooleanFunction();
+        public static readonly ScalarFunction    MAP_VALUE;  // = = new MapValueFunction();
+
+        public abstract ColumnType getExpectedColumnType(ColumnType type);
+        public abstract string getFunctionName();
+    } // FunctionTypeExt class
 } // org.apache.metamodel.query namespace

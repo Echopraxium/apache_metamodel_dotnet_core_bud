@@ -17,7 +17,7 @@
 * under the License.
 */
 // https://github.com/apache/metamodel/blob/b0cfe3aed447769f752743ac1753ebed90adaad2/core/src/main/java/org/apache/metamodel/data/DataSetHeader.java
-using org.apache.metamodel.j2cs.attributes;
+using org.apache.metamodel.j2n.attributes;
 using org.apache.metamodel.query;
 using org.apache.metamodel.schema;
 
@@ -27,7 +27,7 @@ namespace org.apache.metamodel.data
      * Represents the header of a {@link DataSet}, which define the
      * columns/SelectItems of it.
      */
-    [CsSerializableAttribute]
+    [NSerializableAttribute]
     public interface DataSetHeader // : Serializable
     {
         SelectItem[] getSelectItems();

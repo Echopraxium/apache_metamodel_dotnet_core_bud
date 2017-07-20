@@ -17,13 +17,12 @@
 * under the License.
 */
 // https://github.com/apache/metamodel/blob/master/core/src/main/java/org/apache/metamodel/util/Resource.java
-using org.apache.metamodel.util;
-using System;
-using J2CsMM = org.apache.metamodel;
+using org.apache.metamodel.j2n.io;
+using System.IO;
 
 namespace org.apache.metamodel.util
 {
-    public interface Resource<E> : HasName
+    public interface Resource : HasName
     {
         /**
          * Gets the name of the resource, typically a filename or other identifying
@@ -83,7 +82,7 @@ namespace org.apache.metamodel.util
          * @throws ResourceException
          *             if an error occurs while writing
          */
-        void write(Action<System.IO.Stream> writeCallback); // throws ResourceException;
+        void write(CsAction<NOutputStream> writeCallback); // throws ResourceException;
 
         /**
          * Opens up an {@link OutputStream} to write to the resource. Consumers of
@@ -96,7 +95,7 @@ namespace org.apache.metamodel.util
          * @return
          * @throws ResourceException
          */
-        System.IO.Stream write(); //throws ResourceException;
+        NOutputStream write(); //throws ResourceException;
 
         /**
          * Opens up an {@link InputStream} to append (write at the end of the
@@ -107,7 +106,7 @@ namespace org.apache.metamodel.util
          * @throws ResourceException
          *             if an error occurs while appending
          */
-        void append(Action<System.IO.Stream> appendCallback); // throws ResourceException;
+        void append(CsAction<NInputStream> appendCallback); // throws ResourceException;
 
         /**
          * Opens up an {@link OutputStream} to append to the resource. Consumers of
@@ -120,7 +119,7 @@ namespace org.apache.metamodel.util
          * @return
          * @throws ResourceException
          */
-        System.IO.Stream append(); // throws ResourceException;
+        NOutputStream append(); // throws ResourceException;
 
         /**
          * Opens up an {@link InputStream} to read from the resource. Consumers of
@@ -133,7 +132,7 @@ namespace org.apache.metamodel.util
          * @return
          * @throws ResourceException
          */
-        System.IO.Stream read(); // throws ResourceException;
+        NInputStream read(); // throws ResourceException;
 
         /**
          * Opens up an {@link InputStream} to read from the resource, and allows a
@@ -144,7 +143,7 @@ namespace org.apache.metamodel.util
          * @throws ResourceException
          *             if an error occurs while reading
          */
-        void read(Action<System.IO.Stream> readCallback); // throws ResourceException;
+        void read(CsAction<NInputStream> readCallback); // throws ResourceException;
 
         /**
          * Opens up an {@link InputStream} to read from the resource, and allows a
@@ -157,6 +156,6 @@ namespace org.apache.metamodel.util
          * @throws ResourceException
          *             if an error occurs while reading
          */
-         E read(J2CsMM.util.Func<System.IO.Stream, E> readCallback); // throws ResourceException;
+         E read<E>(Func<NInputStream, E> readCallback); // throws ResourceException;
     } // Resource interface
 } // org.apache.metamodel.util namespace

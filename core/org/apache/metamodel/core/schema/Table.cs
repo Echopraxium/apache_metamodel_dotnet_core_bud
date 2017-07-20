@@ -17,7 +17,7 @@
  * under the License.
  */
 // https://github.com/apache/metamodel/blob/master/core/src/main/java/org/apache/metamodel/schema/Table.java
-using org.apache.metamodel.j2cs.attributes;
+using org.apache.metamodel.j2n.attributes;
 using org.apache.metamodel.util;
 
 namespace org.apache.metamodel.schema
@@ -29,7 +29,7 @@ namespace org.apache.metamodel.schema
      * @see Schema
      * @see Column
      */
-    [CsSerializableAttribute]
+    [NSerializableAttribute]
     public interface Table : NamedStructure // ,ISerializable
     {
         /**

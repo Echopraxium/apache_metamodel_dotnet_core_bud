@@ -17,7 +17,6 @@
 * under the License.
 */
 // https://github.com/apache/metamodel/blob/master/core/src/main/java/org/apache/metamodel/query/AggregateFunction.java
-using org.apache.metamodel.schema;
 using org.apache.metamodel.util;
 
 namespace org.apache.metamodel.query

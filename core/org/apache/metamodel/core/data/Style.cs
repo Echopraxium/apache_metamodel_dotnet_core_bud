@@ -18,7 +18,6 @@
 */
 // https://github.com/apache/metamodel/blob/master/core/src/main/java/org/apache/metamodel/data/Style.java
 using org.apache.metamodel.j2n.attributes;
-using org.apache.metamodel.j2n.data;
 using org.apache.metamodel.j2n.data.numbers;
 
 namespace org.apache.metamodel.data

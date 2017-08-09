@@ -17,6 +17,7 @@
  * under the License.
  */
 // https://github.com/apache/metamodel/blob/master/core/src/main/java/org/apache/metamodel/util/Predicate.java
+
 namespace org.apache.metamodel.util
 {
     /**
@@ -25,7 +26,7 @@ namespace org.apache.metamodel.util
      * 
      * @param <E>
      */
-    public interface Predicate<E> : Func<E, bool>
+    public interface Predicate<E> : NFunc<E, bool>
     {
     }
 } // org.apache.metamodel.util NAMESPACE

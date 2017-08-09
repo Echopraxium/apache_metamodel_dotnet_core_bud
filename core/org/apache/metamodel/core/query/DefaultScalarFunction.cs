@@ -36,7 +36,7 @@ namespace org.apache.metamodel.query
 
         public abstract string getFunctionName();
 
-        public ColumnType getExpectedColumnType(ColumnType type)
+        public virtual ColumnType getExpectedColumnType(ColumnType type)
         {
             throw new NotImplementedException();
         }

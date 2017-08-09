@@ -199,7 +199,7 @@ namespace org.apache.metamodel.schema
             {
                 throw new InvalidOperationException("Could not access fields in JdbcTypes", e);
             }
-            return ColumnTypeDefs.OTHER;
+            return ColumnTypeConstants.OTHER;
         } // convertColumnType()
 
         /**
@@ -218,65 +218,65 @@ namespace org.apache.metamodel.schema
             ColumnType type;
             if (cls == typeof(string))
             {
-                type = ColumnTypeDefs.STRING;
+                type = ColumnTypeConstants.STRING;
             }
         else if (cls == typeof(bool)) {
-            type = ColumnTypeDefs.BOOLEAN;
+            type = ColumnTypeConstants.BOOLEAN;
         }
         else if (cls == typeof(char) || cls == typeof(char[])) {
-            type = ColumnTypeDefs.CHAR;
+            type = ColumnTypeConstants.CHAR;
         }
         else if (cls == typeof(byte)) {
-            type = ColumnTypeDefs.TINYINT;
+            type = ColumnTypeConstants.TINYINT;
         }
         else if (cls == typeof(short)) {
-            type = ColumnTypeDefs.SMALLINT;
+            type = ColumnTypeConstants.SMALLINT;
         }
             // https://stackoverflow.com/questions/9696660/what-is-the-difference-between-int-int16-int32-and-int64
             else if (cls == typeof(int) || cls == typeof(Int32)) {
-                type = ColumnTypeDefs.INTEGER;
+                type = ColumnTypeConstants.INTEGER;
             }
             else if (cls == typeof(long) || cls == typeof(Int64)) {
-                type = ColumnTypeDefs.BIGINT;
+                type = ColumnTypeConstants.BIGINT;
             }
             else if (cls == typeof(float)) {
-                type = ColumnTypeDefs.FLOAT;
+                type = ColumnTypeConstants.FLOAT;
             }
             else if (cls == typeof(double)) {
-                type = ColumnTypeDefs.DOUBLE;
+                type = ColumnTypeConstants.DOUBLE;
             }
             // https://stackoverflow.com/questions/2863388/what-is-the-equivalent-of-the-java-bigdecimal-class-in-c
             // else if (cls == BigDecimal.class) {
             else if (cls == typeof(BigInteger)) {
-                type = ColumnTypeDefs.DECIMAL;
+                type = ColumnTypeConstants.DECIMAL;
             }
             //else if (cls == java.sql.Date.class) {
             else if (cls == typeof(DateTime))
             {
-                type = ColumnTypeDefs.DATE;
+                type = ColumnTypeConstants.DATE;
             }
             else if (cls == typeof(NTime))
             {
-                type = ColumnTypeDefs.TIME;
+                type = ColumnTypeConstants.TIME;
             }
             else if (cls == typeof(Guid)) {
-                type = ColumnTypeDefs.UUID;
+                type = ColumnTypeConstants.UUID;
             }
             else if (cls == typeof(NTimeStamp).GetType()) {
-                type = ColumnTypeDefs.TIMESTAMP;
+                type = ColumnTypeConstants.TIMESTAMP;
             }
             else if (typeof(NNumber).IsAssignableFrom(cls)) {
-                type = ColumnTypeDefs.NUMBER;
+                type = ColumnTypeConstants.NUMBER;
             }
             else if (typeof(NDate).IsAssignableFrom(cls))
             {
                 // Date d;
-                type = ColumnTypeDefs.TIMESTAMP;
+                type = ColumnTypeConstants.TIMESTAMP;
             }
 
             else if (typeof(Dictionary<object, object>).IsAssignableFrom(cls))  
             {
-                type = ColumnTypeDefs.MAP;
+                type = ColumnTypeConstants.MAP;
             }
 
             /*
@@ -287,18 +287,18 @@ namespace org.apache.metamodel.schema
 
             else if (typeof(List<object>).IsAssignableFrom(cls)) 
             {
-                type = ColumnTypeDefs.LIST;
+                type = ColumnTypeConstants.LIST;
             } 
             else if (typeof(HashSet<object>).IsAssignableFrom(cls))
             {
-                type = ColumnTypeDefs.SET;
+                type = ColumnTypeConstants.SET;
             }
             else if (cls == typeof(IPAddress).GetType()) {
-                type = ColumnTypeDefs.INET;
+                type = ColumnTypeConstants.INET;
             } 
             else 
             {
-                type = ColumnTypeDefs.OTHER;
+                type = ColumnTypeConstants.OTHER;
             }
             return type;
         } // convertColumnType()

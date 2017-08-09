@@ -1,51 +1,50 @@
 *****************************************************************************************
-*****************************************************************************************
                                         README
-
-Project:                  Porting Apache MetaModel from Java to C# .Net Core
+                                         
+Project:                  Porting Apache MetaModel from Java to C# .Net Core 1.1
 Author:                   Michel Kern (echopraxium)
 License of this document: Apache 2.0
-Version:                  0.0.25
-Date:                     20 july 2017
-*****************************************************************************************
+Version:                  0.1.0
+Date:                     9 august 2017
+IDE:                      Visual Studio 2017 Community 15.2
 *****************************************************************************************
 
 Foreword
 ------------------------------
-Here is an update of a 'bud' for a port of Apache MetaModel from Java to C# (.Net Core). 
-Please notice that it is a very limited subset which has neen ported ATM. 
-Previously I'd applied a "brute force" and "bottom up" approach, now, I've started porting
-the 'Json connector', so it's more "top down". ATM I dont have the System Architect
-skills for Apache MetaModel so a code review by the core developers would be very helpful
-to go forward and make it a worth as a child project of Apache MetaModel.
+Here is the latest version of a conversion from Apache MetaModel's Java code to C# 
+(.Net Core 1.1). Please notice that it is a limited subset which has neen ported ATM. 
 
+It compiles without errors but has not yet been tested at all (not even the Unit Tests 
+ATM). Previously I'd applied a "brute force" and "bottom up" approach. Now I've started 
+to "fill the blanks" in order to build a complete conversion of the 'Json connector'.
+This is then now more a "top down" walkthrough of the java codebase. 
+ATM I miss the System Architect skills for Apache MetaModel (even those of a seasoned 
+developer using Apache MetaModel as a solution). 
+If the codebase is big enough (29% of the 'core' package), it would be helpful if 
+the core team considers doing a code review to validate / invalidate my conversion 
+choices.
 
-0.0.25 Release Notes 
+0.1.0 Release Notes 
 ------------------------------
-* 93 java sources converted (vs 40 previously) even though I must inform that a lot 
-of code is commented out (especially in the new sources released). I had to "cut the 
-branches" in order that the project still compiles without errors.
-* The prefix to differentiate the 'Hemper classes' classes from their Java 
-counterpart is now 'N' instead of 'Cs' (e.g. the class 'CsNumber', an equivalent for 
-Java's 'Number' becomes 'NNumber').
-
-* The namespace of the 'Helper classes' is now 'org.apache.metamodel.j2n' 
-(vs 'org.apache.metamodel.j2cs' previously).
+* Metrics : 
+- 120 java source files ported in C#
+  - 29% of the 'core' package of Apache MetaModel (416 java source files)
+  - 16% of the full code base (748 java source files, including implementation of 
+    connectors like 'Jdbc', 'Json', etc...)
+- 43 'helper' classes (to emulate java classes without a .Net equivalence, these classes 
+  are prefixed by 'N', e.g. (e.g. Java's 'Number' class converted to 'NNumber')).
+ 
 
 Conversion Issues
 ------------------------------
-Even with a limited subset of the java source code files (93), I've encountered a lot of  
-conversions issues, from the very straightforward (e.g. 'String s = input_string.trim()'  
-becomes 'string s = input_string.Trim()'), to the ""equivalence required"" (e.g. anonymous 
-implementation of interface, like in 'getComparable()' method of 'BooleanComparator' class).
+Even with a limited subset of the java source code files (120), I've encountered a lot of  
+conversions issues, from the very straightforward (e.g. 'str.toLowerCase()' converted to
+'str.ToLower()'), to the ""equivalence craft required"" (e.g. anonymous implementation of
+ interface, like in 'getComparable()' method of 'BooleanComparator' class) via 'compiles
+ but untested conversion'.
 
-Anyway, I've compiled the 'conversion recipes' that I've found or crafted on the way and
-(they are documented in 'java2dotnet_recipes.txt', inside 'doc' folder).
-
-I've also provided a set of 'Helper classes' (under core/org/apache/metamodel/j2n), 
-like class extensions (e.g. add a GetHashcode() method to the C# 'object' class), type 
-replacement (e.g. Java's Number class converted to 'NNumber')
-, etc.. 
+I've compiled the 'conversion recipes' that I've found or crafted on the way, they are 
+documented in 'doc/java2dotnet_recipes.txt').
 
 Best Regards
 Michel Kern (echopraxium on GitHub)

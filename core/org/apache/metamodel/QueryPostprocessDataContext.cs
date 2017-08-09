@@ -17,6 +17,7 @@
  * under the License.
  */
 using org.apache.metamodel.core.data;
+using org.apache.metamodel.core.query;
 using org.apache.metamodel.data;
 using org.apache.metamodel.j2n.slf4j;
 using org.apache.metamodel.query;
@@ -91,17 +92,17 @@ namespace org.apache.metamodel
 
         public override DataSet executeQuery(Query query)
         {
-            //    List<SelectItem> selectItems = query.getSelectClause().getItems();
-            //    List<FromItem> fromItems = query.getFromClause().getItems();
-            //    List<FilterItem> whereItems = query.getWhereClause().getItems();
-            //    List<SelectItem> whereSelectItems = query.getWhereClause().getEvaluatedSelectItems();
-            //    List<GroupByItem> groupByItems = query.getGroupByClause().getItems();
-            //    List<SelectItem> groupBySelectItems = query.getGroupByClause().getEvaluatedSelectItems();
-            //    List<SelectItem> havingSelectItems = query.getHavingClause().getEvaluatedSelectItems();
-            //    List<SelectItem> orderBySelectItems = query.getOrderByClause().getEvaluatedSelectItems();
+            List<SelectItem>  selectItems        = query.getSelectClause().getItems();
+            List<FromItem>    fromItems          = query.getFromClause().getItems();
+            List<FilterItem>  whereItems         = query.getWhereClause().getItems();
+            List<SelectItem>  whereSelectItems   = query.getWhereClause().getEvaluatedSelectItems();
+            List<GroupByItem> groupByItems       = query.getGroupByClause().getItems();
+            List<SelectItem>  groupBySelectItems = query.getGroupByClause().getEvaluatedSelectItems();
+            List<SelectItem>  havingSelectItems  = query.getHavingClause().getEvaluatedSelectItems();
+            List<SelectItem>  orderBySelectItems = query.getOrderByClause().getEvaluatedSelectItems();
 
-            //    List<FilterItem> havingItems = query.getHavingClause().getItems();
-            //    List<OrderByItem> orderByItems = query.getOrderByClause().getItems();
+            List<FilterItem>  havingItems  = query.getHavingClause().getItems();
+            List<OrderByItem> orderByItems = query.getOrderByClause().getItems();
 
             //    int firstRow = (query.getFirstRow() == null ? 1 : query.getFirstRow());
             //    int maxRows = (query.getMaxRows() == null ? -1 : query.getMaxRows());
@@ -258,21 +259,21 @@ namespace org.apache.metamodel
          * @param clause
          * @return
          */
-        //private bool isSimpleSelect(SelectClause clause)
-        //{
-        //    if (clause.isDistinct())
-        //    {
-        //        return false;
-        //    }
-        //    foreach (SelectItem item in clause.getItems())
-        //    {
-        //        if (item.getAggregateFunction() != null || item.getExpression() != null)
-        //        {
-        //            return false;
-        //        }
-        //    }
-        //    return true;
-        //} // isSimpleSelect()
+        private bool isSimpleSelect(SelectClause clause)
+        {
+            if (clause.isDistinct())
+            {
+                return false;
+            }
+            foreach (SelectItem item in clause.getItems())
+            {
+               if (item.getAggregateFunction() != null || item.getExpression() != null)
+               {
+                   return false;
+               }
+           }
+            return true;
+        } // isSimpleSelect()
 
         /**
          * Executes a simple count query, if possible. This method is provided to

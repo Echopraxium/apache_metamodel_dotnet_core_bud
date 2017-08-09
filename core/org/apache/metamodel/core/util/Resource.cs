@@ -82,7 +82,7 @@ namespace org.apache.metamodel.util
          * @throws ResourceException
          *             if an error occurs while writing
          */
-        void write(CsAction<NOutputStream> writeCallback); // throws ResourceException;
+        void write(NAction<NOutputStream> writeCallback); // throws ResourceException;
 
         /**
          * Opens up an {@link OutputStream} to write to the resource. Consumers of
@@ -106,7 +106,7 @@ namespace org.apache.metamodel.util
          * @throws ResourceException
          *             if an error occurs while appending
          */
-        void append(CsAction<NInputStream> appendCallback); // throws ResourceException;
+        void append(NAction<NInputStream> appendCallback); // throws ResourceException;
 
         /**
          * Opens up an {@link OutputStream} to append to the resource. Consumers of
@@ -143,7 +143,7 @@ namespace org.apache.metamodel.util
          * @throws ResourceException
          *             if an error occurs while reading
          */
-        void read(CsAction<NInputStream> readCallback); // throws ResourceException;
+        void read(NAction<NInputStream> readCallback); // throws ResourceException;
 
         /**
          * Opens up an {@link InputStream} to read from the resource, and allows a
@@ -156,6 +156,6 @@ namespace org.apache.metamodel.util
          * @throws ResourceException
          *             if an error occurs while reading
          */
-         E read<E>(Func<NInputStream, E> readCallback); // throws ResourceException;
+         E read<E>(NFunc<NInputStream, E> readCallback); // throws ResourceException;
     } // Resource interface
 } // org.apache.metamodel.util namespace

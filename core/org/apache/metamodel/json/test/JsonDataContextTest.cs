@@ -128,7 +128,7 @@ namespace org.apache.metamodel.json
             DataSet ds = dataContext
                           .query()
                           .from(schema.getTable(0))
-                          .select(FunctionTypeExt.MAP_VALUE, "name", new object[] { "first" })
+                          .select(FunctionTypeConstants.MAP_VALUE, "name", new object[] { "first" })
                           .execute();
             try
             {

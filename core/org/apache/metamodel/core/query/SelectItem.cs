@@ -23,7 +23,8 @@ using System;
 using System.Text;
 using org.apache.metamodel.j2n.collections;
 using org.apache.metamodel.j2n.slf4j;
-using org.apache.metamodel.j2n.collections;
+using org.apache.metamodel.j2n;
+using org.apache.metamodel.core.util;
 
 namespace org.apache.metamodel.query
 {
@@ -42,16 +43,17 @@ namespace org.apache.metamodel.query
      * 
      * @see SelectClause
     */
-    public class SelectItem : BaseObject, QueryItem //, ICloneable
+    public class SelectItem : BaseObject, QueryItem, NCloneable
     {
         public static readonly string  FUNCTION_APPROXIMATION_PREFIX = "APPROXIMATE ";
 
-        private static readonly long   serialVersionUID = 317475105509663973L;
+        private static readonly long    serialVersionUID = 317475105509663973L;
+
         private static readonly NLogger logger           = NLoggerFactory.getLogger(typeof(SelectItem).Name);
 
         // immutable fields (essense)
         private readonly Column        _column;
-        private readonly FunctionType _function;
+        private readonly FunctionType  _function;
         private readonly object[]      _functionParameters;
         private readonly string        _expression;
         private readonly SelectItem    _subQuerySelectItem;
@@ -236,7 +238,7 @@ namespace org.apache.metamodel.query
          * 
          * @param identifiers
         */
-        protected override void decorateIdentity(NList<Object> identifiers)
+        public override void decorateIdentity(NList<Object> identifiers)
         {
             identifiers.add(_expression);
             identifiers.add(_alias);
@@ -263,7 +265,7 @@ namespace org.apache.metamodel.query
         public static SelectItem getCountAllItem()
         {
             object[] values = { "*" };
-            return new SelectItem(FunctionTypeExt.COUNT, values, null);
+            return new SelectItem(FunctionTypeConstants.COUNT, values, null);
         } // getCountAllItem()
 
         public static bool isCountAllItem(SelectItem item)
@@ -399,7 +401,7 @@ namespace org.apache.metamodel.query
             return _expression;
         } // getExpression()
 
-        public SelectItem setQuery(Query query)
+        public QueryItem setQuery(Query query)
         {
             _query = query;
             return this;
@@ -497,7 +499,7 @@ namespace org.apache.metamodel.query
          * @return an alias that can be used in WHERE, GROUP BY and ORDER BY clauses
          *         in the same query
          */
-        public string getSameQueryAlias(bool includeSchemaInColumnPath)
+        public string getSameQueryAlias(bool? includeSchemaInColumnPath)
         {
             if (_column != null)
             {
@@ -533,7 +535,7 @@ namespace org.apache.metamodel.query
             return toSql(false);
         }
 
-        public string toSql(bool includeSchemaInColumnPath)
+        public string toSql(bool? includeSchemaInColumnPath)
         {
             StringBuilder sb = toStringNoAlias(includeSchemaInColumnPath);
             if (_alias != null)
@@ -549,7 +551,7 @@ namespace org.apache.metamodel.query
             return toStringNoAlias(false);
         }
 
-        public StringBuilder toStringNoAlias(bool includeSchemaInColumnPath)
+        public StringBuilder toStringNoAlias(bool? includeSchemaInColumnPath)
         {
             StringBuilder sb = new StringBuilder();
             if (_column != null)
@@ -596,13 +598,8 @@ namespace org.apache.metamodel.query
             return sb;
         } // toStringNoAlias()
 
-        internal SelectItem clone()
-        {
-            throw new NotImplementedException();
-        }
-
         //[J2Cs: Stub ]
-        private string getToStringColumnPrefix(bool includeSchemaInColumnPath)
+        private string getToStringColumnPrefix(bool? includeSchemaInColumnPath)
         {
             return "";
         }
@@ -691,10 +688,10 @@ namespace org.apache.metamodel.query
             return eb.isEquals();
         } // equalsIgnoreAlias()
 
-        //protected SelectItem clone()
-        //{
-        //    return clone(null);
-        //}
+        public SelectItem clone()
+        {
+            return clone(null);
+        }
 
         /**
          * Creates a clone of the {@link SelectItem} for use within a cloned
@@ -706,35 +703,35 @@ namespace org.apache.metamodel.query
          *            been cloned in this {@link Query}.
          * @return
          */
-        //protected SelectItem clone(Query clonedQuery)
-        //{
-        //    SelectItem subQuerySelectItem = (_subQuerySelectItem == null ? null : _subQuerySelectItem.clone());
-        //    FromItem fromItem;
-        //    if (_fromItem == null)
-        //    {
-        //        fromItem = null;
-        //    }
-        //    else if (clonedQuery != null && _query != null)
-        //    {
-        //        int indexOfFromItem = _query.getFromClause().indexOf(_fromItem);
-        //        if (indexOfFromItem != -1)
-        //        {
-        //            fromItem = clonedQuery.getFromClause().getItem(indexOfFromItem);
-        //        }
-        //        else
-        //        {
-        //            fromItem = _fromItem.clone();
-        //        }
-        //    }
-        //    else
-        //    {
-        //        fromItem = _fromItem.clone();
-        //    }
+        public SelectItem clone(Query clonedQuery)
+        {
+              SelectItem subQuerySelectItem = (_subQuerySelectItem == null ? null : _subQuerySelectItem.clone());
+              FromItem   fromItem;
+              if (_fromItem == null)
+              {
+                  fromItem = null;
+              }
+              else if (clonedQuery != null && _query != null)
+              {
+                  int indexOfFromItem = _query.getFromClause().indexOf(_fromItem);
+                  if (indexOfFromItem != -1)
+                  {
+                      fromItem = clonedQuery.getFromClause().getItem(indexOfFromItem);
+                  }
+                  else
+                  {
+                     fromItem = _fromItem.clone();
+                  }
+              }
+              else
+              {
+                  fromItem = _fromItem.clone();
+              }
 
-        //    SelectItem s = new SelectItem(_column, fromItem, _function, _functionParameters, _expression,
-        //            subQuerySelectItem, _alias, _functionApproximationAllowed);
-        //    return s;
-        //} // clone()
+              SelectItem s = new SelectItem(_column, fromItem, _function, _functionParameters, _expression,
+                                             subQuerySelectItem, _alias, _functionApproximationAllowed);
+              return s;
+        } // clone()
 
         /**
          * Creates a copy of the {@link SelectItem}, with a different
@@ -792,19 +789,9 @@ namespace org.apache.metamodel.query
             return toSql();
         }
 
-        public object Clone()
-        {
-            throw new NotImplementedException();
-        }
-
-        QueryItem QueryItem.setQuery(Query query)
-        {
-            throw new NotImplementedException();
-        }
-
         public string toString()
         {
             throw new NotImplementedException();
         }
-    }
+    } // SelectItem class
 } // org.apache.metamodel.query namespace

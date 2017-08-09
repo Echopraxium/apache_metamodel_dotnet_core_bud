@@ -73,7 +73,7 @@ namespace org.apache.metamodel.schema
         int getJdbcType(); // throws IllegalStateException;
     } // ColumnType interface
 
-    public class ColumnTypeDefs
+    public class ColumnTypeConstants
     {
         /*
          * Literal
@@ -144,5 +144,5 @@ namespace org.apache.metamodel.schema
         public static readonly ColumnType SET = new ColumnTypeImpl("SET", SuperColumnType.OTHER_TYPE, typeof(HashSet<object>));
         public static readonly ColumnType STRING = new ColumnTypeImpl("STRING", SuperColumnType.LITERAL_TYPE);
         public static readonly ColumnType NUMBER = new ColumnTypeImpl("NUMBER", SuperColumnType.NUMBER_TYPE);
-    } // ColumnTypeDefs class
+    } // ColumnTypeConstants class
 } // org.apache.metamodel.schema namespace

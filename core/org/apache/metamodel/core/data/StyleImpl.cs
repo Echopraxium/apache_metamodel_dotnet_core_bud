@@ -19,7 +19,6 @@
 // https://github.com/apache/metamodel/blob/master/core/src/main/java/org/apache/metamodel/data/StyleImpl.java
 using org.apache.metamodel.j2n.collections;
 using org.apache.metamodel.j2n.data.numbers;
-using org.apache.metamodel.j2n.collections;
 using org.apache.metamodel.util;
 using System;
 using System.Text;
@@ -175,7 +174,7 @@ namespace org.apache.metamodel.data
             }
         }
 
-        protected override void decorateIdentity( NList<object> identifiers)
+        public override void decorateIdentity( NList<object> identifiers)
         {
             identifiers.Add(_underline);
             identifiers.Add(_italic);

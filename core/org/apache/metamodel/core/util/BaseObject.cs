@@ -21,6 +21,7 @@ using org.apache.metamodel.j2n;
 using org.apache.metamodel.j2n.collections;
 using org.apache.metamodel.j2n.data.numbers;
 using org.apache.metamodel.j2n.slf4j;
+using org.apache.metamodel.core.util;
 using System;
 using System.Diagnostics;
 
@@ -167,6 +168,9 @@ namespace org.apache.metamodel.util
          * 
          * @param identifiers
          */
-        protected abstract void decorateIdentity(NList<object> identifiers);
+        public virtual void decorateIdentity(NList<object> identifiers)
+        {
+            throw new NotImplementedException();
+        }
     } // BaseObject class
 } // org.apache.metamodel.util namespace

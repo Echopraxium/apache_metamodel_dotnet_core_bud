@@ -30,7 +30,9 @@
 //import org.apache.metamodel.util.ObjectComparator;
 //import org.apache.metamodel.util.WildcardPattern;
 
+using org.apache.metamodel.core.data;
 using org.apache.metamodel.data;
+using org.apache.metamodel.j2n;
 using org.apache.metamodel.j2n.collections;
 using org.apache.metamodel.schema;
 using org.apache.metamodel.util;
@@ -48,7 +50,7 @@ namespace org.apache.metamodel.query
      * @see OperatorType
      * @see LogicalOperator
      */
-    public class FilterItem : BaseObject, QueryItem //, Cloneable, IRowFilter
+    public class FilterItem : BaseObject, QueryItem, NCloneable, IRowFilter
     {
         private static readonly long serialVersionUID = 2435322742894653227L;
 
@@ -186,7 +188,7 @@ namespace org.apache.metamodel.query
             throw new NotImplementedException();
         }
 
-        protected override void decorateIdentity(NList<object> identifiers)
+        public override void decorateIdentity(NList<object> identifiers)
         {
             throw new NotImplementedException();
         }
@@ -288,7 +290,7 @@ namespace org.apache.metamodel.query
          * Parses the constraint as a SQL Where-clause item
          */
         //@Override
-        public String toSql(bool includeSchemaInColumnPaths)
+        public String toSql(bool? includeSchemaInColumnPaths)
         {
             if (_expression != null)
             {
@@ -523,7 +525,7 @@ namespace org.apache.metamodel.query
         }
 
         // @Override
-        protected FilterItem clone()
+        public FilterItem clone()
         {
             NList<FilterItem> orItems;
             if (_childItems == null)

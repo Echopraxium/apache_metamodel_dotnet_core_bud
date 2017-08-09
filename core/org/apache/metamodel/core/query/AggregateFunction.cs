@@ -33,7 +33,7 @@ namespace org.apache.metamodel.query
          *
          * @return an AggregateBuilder instance
          */
-        AggregateBuilder createAggregateBuilder();
+        AggregateBuilder<E> createAggregateBuilder<E>();
 
         /**
          * Shorthand for creating an aggregate builder, adding all

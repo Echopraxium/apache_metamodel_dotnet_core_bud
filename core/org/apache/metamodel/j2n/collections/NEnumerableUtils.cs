@@ -37,5 +37,16 @@ namespace org.apache.metamodel.j2n.collections
         {
             return source.toList();
         } // toList<T>
+
+        // https://stackoverflow.com/questions/20923418/collection-containsall-implementation-in-c-sharp
+        public static bool ContainsAll<T>(this IEnumerable<T> source, IEnumerable<T> inner)
+        {
+            return inner.All(source.Contains);
+        }
+
+        public static bool Contains<T>(this IEnumerable<T> source, IEnumerable<T> inner, IEqualityComparer<T> comparer)
+        {
+            return inner.All(element => source.Contains(element, comparer));
+        }
     } // NEnumerableUtils
 } // org.apache.metamodel.j2n.collections namespace

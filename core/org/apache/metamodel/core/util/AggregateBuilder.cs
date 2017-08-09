@@ -26,10 +26,10 @@ namespace org.apache.metamodel.util
      * @param <E>
      *            the aggregate result type
      */
-    public interface AggregateBuilder
+    public interface AggregateBuilder<E>
     {
         void add(object o);
 
-        E getAggregate<E>();
+        E getAggregate();
     } // AggregateBuilder class
 } // org.apache.metamodel.util namespace

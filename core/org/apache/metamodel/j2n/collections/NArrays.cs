@@ -22,7 +22,7 @@ namespace org.apache.metamodel.j2n.collections
 {
     public static class NArrays
     {
-        public static List<T> asList<T>(params T[] a)
+        public static List<T> AsList<T>(params T[] a)
         {
             return new List<T>(a);
         } // asList()

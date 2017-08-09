@@ -11,7 +11,7 @@ namespace org.apache.metamodel.query
         QueryItem setQuery(Query query);
         Query     getQuery();
         string    toSql();
-        string    toSql(bool includeSchemaInColumnPaths);
+        string    toSql(bool? includeSchemaInColumnPaths);
         string    toString();
     } // QueryItem interface
 } // org.apache.metamodel.query namespace

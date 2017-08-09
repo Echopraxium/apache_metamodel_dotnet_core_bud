@@ -29,5 +29,10 @@ namespace org.apache.metamodel.j2n.data
         {
             return value == null || value == "";
         } // IsEmpty()
+
+        public static int CompareTo_(this string value, string value2)
+        {
+            return value.CompareTo(value2);
+        } // CompareTo()
     } // NStringExtensions class
 } // org.apache.metamodel.j2n.data namespace

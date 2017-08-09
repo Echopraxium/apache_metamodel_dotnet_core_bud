@@ -17,6 +17,7 @@
 * under the License.
 */
 // https://github.com/apache/metamodel/blob/master/core/src/main/java/org/apache/metamodel/schema/Column.java
+using org.apache.metamodel.j2n.data.numbers;
 using org.apache.metamodel.util;
 
 namespace org.apache.metamodel.schema
@@ -65,7 +66,7 @@ namespace org.apache.metamodel.schema
          * @return true if this column accepts null values, false if not and null if
          *         not known.
          */
-         bool isNullable();
+         bool? isNullable();
 
         /**
          * Gets any remarks/comments to this column.
@@ -82,7 +83,7 @@ namespace org.apache.metamodel.schema
          */
         // Note: 'Integer' return type changed to 'int'
         //        https://stackoverflow.com/questions/30296734/is-there-a-integer-class-in-c
-        int getColumnSize();
+        NInteger getColumnSize();
 
         /**
          * Gets the native type of this column. A native type is the name of the

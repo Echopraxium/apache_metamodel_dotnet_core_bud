@@ -1,13 +1,15 @@
 ﻿*****************************************************************************************
-                          Java to C# (.Net Core- conversion recipes
+                               Java to C# conversion recipes
 
-Project:                  Porting Apache MetaModel to C# .Net Core
+Project:                  Porting Apache MetaModel to C# (.Net Core 1.1)
 Author:                   Michel Kern (echopraxium)
+Version:                  0.1.0   
 License of this document: Apache 2.0
 *****************************************************************************************
 http://www.25hoursaday.com/csharpvsjava.html
 https://www.codeproject.com/Articles/4881/A-Comparative-Study-of-Java-and-C
 https://en.wikipedia.org/wiki/Comparison_of_C_Sharp_and_Java
+https://www.jmdoudoux.fr/java/dej/chap-java_dotnet.htm
 
 ** ToDo **
 * Investigate if it is worth using JavApi: https://github.com/RealBastie/JavApi
@@ -24,7 +26,7 @@ https://en.wikipedia.org/wiki/Comparison_of_C_Sharp_and_Java
 
 1.1.1. Common conversions
 -------------------------
-* java: object o;
+* java: Object o;
   C#:   object o; // object <=> System.Object
 
 * java: Objets.equals(o1, o2)
@@ -45,20 +47,6 @@ https://en.wikipedia.org/wiki/Comparison_of_C_Sharp_and_Java
 
 * java: Boolean b;
   C#:   bool    b;
-
-* java: ArrayList
-  C#:   List
-
-* java: Map
-  C#:   Dictionary
-  https://stackoverflow.com/questions/687942/java-map-equivalent-in-c-sharp?rq=1
-
-* java: HashMap
-  C#:   Dictionary
-  https://stackoverflow.com/questions/1273139/c-sharp-java-hashmap-equivalent
-
-* java: Iterable<T>
-  C#:   IEnumerable<T>
 ---- 1.1.1.  Common conversions
 
 
@@ -77,31 +65,36 @@ https://en.wikipedia.org/wiki/Comparison_of_C_Sharp_and_Java
 * java: string s;
   C#:   string s;
 
-* java: toUpperCase();
-  C#:   ToUpper();
-
-* java: trim();
-  C#:   Trim();
-
-* java: lastIndexOf();
-  C#:   LastIndexOf();
-
-* java: StringBuilder sb;
-  C#:   // using System.Text;
-        StringBuilder sb;
-
 * java: s1.equalsIgnoreCase(s2))
   C#:   s1.Equals(s2, StringComparison.CurrentCultureIgnoreCase))
+
+* java: str.charAt(i);
+  C#:   str[i];
+
+* java: toUpperCase()
+  C#:   ToUpper()
+
+* java: trim()
+  C#:   Trim()
+
+* java: indexOf()
+  C#:   IndexOf()
+
+* java: lastIndexOf()
+  C#:   LastIndexOf()
+
+* java: replaceAll()
+  C#:   Replace()
+
+* java: StringBuilder sb;
+  C#:   StringBuilder sb; // using System.Text;    
 ---- 1.1.3. Strings
 
 
-1.1.4. Default Type Conversions
+1.1.4. Type Conversions
 -------------------------------
-* java: Object
-  C#:   CsObject
-
 * java: Date
-  C#:   CsDate
+  C#:   NDate
 ---- 1.1.4. Default Type Conversions
 
 
@@ -110,34 +103,72 @@ https://en.wikipedia.org/wiki/Comparison_of_C_Sharp_and_Java
   C#:   // using System.Collections.Generic;
         HashSet<Table> set = new HashSet<Table>();
 
+* java: URI
+  C#:   Uri 
+
 * java: InetAddress
   C#:   IPAddress 
   http://www.snmpsharpnet.com/?page_id=60
------ end of '1.1. Types'
+----- end of '1.1.4. Type Conversions'
 
 
 1.2. Interfaces
 -----------------------
 * java: Serializable
-  C#:   Nothing in .Net Core. Replaced by  'CsSerializableAttribute' attribute
+  C#:   Nothing in .Net Core. Replaced by  'NSerializableAttribute' attribute
 
 * java: Cloneable
-  C#:   ICloneable 
+  C#:   NCloneable 
 ----- end of '1.2. Interfaces'
 
 
-1.3. Collection methods
+1.3. Collections and arrays
 -----------------------
+* java: ArrayList
+  C#:   List
+
+* java: Entry<K, V>
+  C#:   KeyValuePair<K, V>
+
+* java: Map
+  C#:   Dictionary
+  https://stackoverflow.com/questions/687942/java-map-equivalent-in-c-sharp?rq=1
+
+* java: HashMap
+  C#:   Dictionary
+  https://stackoverflow.com/questions/1273139/c-sharp-java-hashmap-equivalent
+
+* java: ConcurrentHashMap
+  C#:   ConcurrentDictionary
+  https://stackoverflow.com/questions/420860/equivalent-of-javas-concurrenthashmap-in-c
+
+* java: Iterable<T>
+  C#:   IEnumerable<T>
+
 * java: Collection<string>
   C#:   IList<string>
+
+* java: addAll()
+  C#:   addRange()
 
 * java: // String[] values;
         int length = Array.getLength(values);
   C#:   // string[] values;
         int length = ((Array) values).GetLength(1);
 
-* java: Iterator<Object>     it1 = list1.iterator();
-  C#:   IEnumerator<object>  it1 = list1.GetEnumerator();
+* java: // ArrayList<String> items;
+        items.add(item);
+  C#:   // List<string> items;
+        items.Add(item); // Uppercase 'A'
+
+* java: Iterator<Object>
+  C#:   IEnumerator<object>
+
+* java: Iterable<Object> 
+  C#:   IEnumerable<object>
+
+* java: System.arraycopy()
+  C#:   Array.Copy()
 
 * java: // ArrayList<String> items = new ArrayList<String>();
         int items_count = items.size();
@@ -185,20 +216,7 @@ https://en.wikipedia.org/wiki/Comparison_of_C_Sharp_and_Java
         set.addAll(items);
   C#:   // HashSet<string> set = new HashSet<Table>();
         set.UnionWith(items);
------ end of '1.3. Collection methods'
-
-
-1.4. Annotations
------------------------
-* java: // interface service annotation:
-        @Override
-		public string getName();
-  C#:   string getName(); // annotation is useless, 'public' keyword is forbidden in C# interface method declarations
-
-* java: @Deprecated            // Annotation
-  C#:   [System.Obsolete]      // Annotation
-  https://stackoverflow.com/questions/1759352/how-do-i-mark-a-method-as-obsolete-deprecated
------ end of '1.4. Annotations'
+----- end of '1.3. Collections'
 
 
 1.4. Input Output
@@ -208,6 +226,10 @@ https://en.wikipedia.org/wiki/Comparison_of_C_Sharp_and_Java
 
 * java: OutputStream
   C#:   NOutputStream
+
+* java: ObjectInputStream / ObjectOutputStream
+  C#:   XmlSerializer (NB: requires validation, 'BinaryFormatter'
+        would have been useful it seems but missing in .Net Core 1.1)
 
 * java: File
   C#:   use either 'NInputStream', 'NOutputStream', 'FileStream'
@@ -226,23 +248,34 @@ https://en.wikipedia.org/wiki/Comparison_of_C_Sharp_and_Java
   C#:   StreamReader  // 'educated guess', I read that ".Net streams are buffered by default"
 
 * java: implements Serializable / extends Serializable
-  C#:   ISerializable / : ISerializable
+  C#:   Design issue:        'Serializable' is not missing in  .Net Core.
+        Suggested Solutions:  replace it by a 'Helper interface' (e.g. 'NSerializable') or 
+		                      a class attribute ('NSerializableAttribute' which is provided)
 ----- end of '1.4. Input Output'
 
 
 1.5. Exceptions
 -----------------------
+* java: RuntimeException
+  C#:   NRuntimeException
+
+* java: NullPointerException
+  C#:   NullReferenceException
+
 * java: IllegalStateException
-  C#:   InvalidOperationException // using System;
+  C#:   InvalidOperationException
 
 * java: IllegalArgumentException
-  C#:   ArgumentException // using System;
+  C#:   ArgumentException
 
 * java: NumberFormatException
   C#:   FormatException
 
 * java: ResourceException
-  C#:   CsResourceException
+  C#:   NResourceException
+
+* java: UnsupportedOperationException
+  C#:   NUnsupportedOperationException
 
 * java: InvocationTargetException
   C#:   TargetInvocationException
@@ -253,6 +286,19 @@ https://en.wikipedia.org/wiki/Comparison_of_C_Sharp_and_Java
         // C# doesnt support checked exceptions. Maybe a custom method annotation would be a semantic equivalence ?
         return_type method_name(); //throws ..;
 ----- end of '1.5. Exceptions'
+
+
+1.6. Annotations
+-----------------------
+* java: // interface service annotation:
+        @Override
+		public string getName();
+  C#:   string getName(); // annotation is useless, 'public' keyword is forbidden in C# interface method declarations
+
+* java: @Deprecated            // Annotation
+  C#:   [System.Obsolete]      // Annotation
+  https://stackoverflow.com/questions/1759352/how-do-i-mark-a-method-as-obsolete-deprecated
+----- end of '1.4. Annotations'
 
 
 * java: // varargs
@@ -277,11 +323,6 @@ https://en.wikipedia.org/wiki/Comparison_of_C_Sharp_and_Java
 	    public string toString() { ... }
   C#:   // List<string> items;
         public override string ToString() { ... } // Uppercase 'T'
-
-* java: // ArrayList<String> items;
-        items.add(item);
-  C#:   // List<string> items;
-        items.Add(item); // Uppercase 'A'
 
 * java: // Call other constructor
         public MyClass(string msg)

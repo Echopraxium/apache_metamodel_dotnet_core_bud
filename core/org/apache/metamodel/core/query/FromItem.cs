@@ -17,9 +17,8 @@
 * under the License.
 */
 // https://github.com/apache/metamodel/blob/b0cfe3aed447769f752743ac1753ebed90adaad2/core/src/main/java/org/apache/metamodel/query/FromItem.java
-using org.apache.metamodel.data;
+using org.apache.metamodel.j2n;
 using org.apache.metamodel.j2n.collections;
-using org.apache.metamodel.query;
 using org.apache.metamodel.schema;
 using org.apache.metamodel.util;
 using System;
@@ -39,7 +38,7 @@ namespace org.apache.metamodel.query
      * 
      * @see FromClause
      */
-    public class FromItem : BaseObject, QueryItem //, Cloneable
+    public class FromItem : BaseObject, QueryItem, NCloneable
     {
         private static readonly long serialVersionUID = -6559220014058975193L;
 
@@ -222,86 +221,80 @@ namespace org.apache.metamodel.query
             return toSql(false);
         }
 
-        //[J2Cs: Stub]
-        public String toSql(bool includeSchemaInColumnPaths)
+        public String toSql(bool? includeSchemaInColumnPaths)
         {
-            return "";
+            String stringNoAlias = toStringNoAlias(includeSchemaInColumnPaths);
+            StringBuilder sb = new StringBuilder(stringNoAlias);
+            if (_join != JoinType.None && _alias != null)
+            {
+                sb.Insert(0, '(');
+                sb.Append(')');
+            }
+            if (_alias != null)
+            {
+                sb.Append(' ');
+                sb.Append(_alias);
+            }
+            return sb.ToString();
         }
 
-        //public String toSql(bool includeSchemaInColumnPaths)
-        //{
-        //    String stringNoAlias = toStringNoAlias(includeSchemaInColumnPaths);
-        //    StringBuilder sb = new StringBuilder(stringNoAlias);
-        //    if (_join != null && _alias != null)
-        //    {
-        //        sb.Insert(0, '(');
-        //        sb.Append(')');
-        //    }
-        //    if (_alias != null)
-        //    {
-        //        sb.Append(' ');
-        //        sb.Append(_alias);
-        //    }
-        //    return sb.ToString();
-        //}
+        public String toStringNoAlias()
+        {
+            return toStringNoAlias(false);
+        }
 
-        //public String toStringNoAlias()
-        //{
-        //    return toStringNoAlias(false);
-        //}
+        public String toStringNoAlias(bool? includeSchemaInColumnPaths)
+        {
+            if (_expression != null)
+            {
+                return _expression;
+            }
+            StringBuilder sb = new StringBuilder();
+            if (_table != null)
+            {
+                if (_table.getSchema() != null && _table.getSchema().getName() != null)
+                {
+                    sb.Append(_table.getSchema().getName());
+                    sb.Append('.');
+                }
+                sb.Append(_table.getQuotedName());
+            }
+            else if (_subQuery != null)
+            {
+                sb.Append('(');
+                sb.Append(_subQuery.toSql(includeSchemaInColumnPaths));
+                sb.Append(')');
+            }
+            else if (_join != JoinType.None)
+            {
+                String leftSideAlias  = _leftSide.getSameQueryAlias();
+                String rightSideAlias = _rightSide.getSameQueryAlias();
+                sb.Append(_leftSide.toSql());
+                sb.Append(' ');
+                sb.Append(_join);
+                sb.Append(" JOIN ");
+                sb.Append(_rightSide.toSql());
+                for (int i = 0; i < _leftOn.Length; i++)
+                {
+                    if (i == 0)
+                    {
+                        sb.Append(" ON ");
+                    }
+                    else
+                    {
+                        sb.Append(" AND ");
+                    }
+                    SelectItem primary = _leftOn[i];
+                    appendJoinOnItem(sb, leftSideAlias, primary);
 
-        //public String toStringNoAlias(bool includeSchemaInColumnPaths)
-        //{
-        //    if (_expression != null)
-        //    {
-        //        return _expression;
-        //    }
-        //    StringBuilder sb = new StringBuilder();
-        //    if (_table != null)
-        //    {
-        //        if (_table.getSchema() != null && _table.getSchema().getName() != null)
-        //        {
-        //            sb.Append(_table.getSchema().getName());
-        //            sb.Append('.');
-        //        }
-        //        sb.Append(_table.getQuotedName());
-        //    }
-        //    else if (_subQuery != null)
-        //    {
-        //        sb.Append('(');
-        //        sb.Append(_subQuery.toSql(includeSchemaInColumnPaths));
-        //        sb.Append(')');
-        //    }
-        //    else if (_join != null)
-        //    {
-        //        String leftSideAlias  = _leftSide.getSameQueryAlias();
-        //        String rightSideAlias = _rightSide.getSameQueryAlias();
-        //        sb.Append(_leftSide.toSql());
-        //        sb.Append(' ');
-        //        sb.Append(_join);
-        //        sb.Append(" JOIN ");
-        //        sb.Append(_rightSide.toSql());
-        //        for (int i = 0; i < _leftOn.Length; i++)
-        //        {
-        //            if (i == 0)
-        //            {
-        //                sb.Append(" ON ");
-        //            }
-        //            else
-        //            {
-        //                sb.Append(" AND ");
-        //            }
-        //            SelectItem primary = _leftOn[i];
-        //            appendJoinOnItem(sb, leftSideAlias, primary);
+                    sb.Append(" = ");
 
-        //            sb.Append(" = ");
-
-        //            SelectItem foreign = _rightOn[i];
-        //            appendJoinOnItem(sb, rightSideAlias, foreign);
-        //        }
-        //    }
-        //    return sb.ToString();
-        //} // toStringNoAlias()
+                    SelectItem foreign = _rightOn[i];
+                    appendJoinOnItem(sb, rightSideAlias, foreign);
+                }
+            }
+            return sb.ToString();
+        } // toStringNoAlias()
 
         private void appendJoinOnItem(StringBuilder sb, String sideAlias, SelectItem onItem)
         {
@@ -373,28 +366,28 @@ namespace org.apache.metamodel.query
             return this;
         }
 
-        //protected FromItem clone()
-        //{
-        //    FromItem f    = new FromItem();
-        //    f._alias      = _alias;
-        //    f._join       = _join;
-        //    f._table      = _table;
-        //    f._expression = _expression;
-        //    if (_subQuery != null)
-        //    {
-        //        f._subQuery = _subQuery.clone();
-        //    }
-        //    if (_leftOn != null && _leftSide != null && _rightOn != null && _rightSide != null)
-        //    {
-        //        f._leftSide  = _leftSide.clone();
-        //        f._leftOn    = _leftOn.clone();
-        //        f._rightSide = _rightSide.clone();
-        //        f._rightOn   = _rightOn.clone();
-        //    }
-        //    return f;
-        //} // clone()
+        public FromItem clone()
+        {
+            FromItem f    = new FromItem();
+            f._alias      = _alias;
+            f._join       = _join;
+            f._table      = _table;
+            f._expression = _expression;
+            if (_subQuery != null)
+            {
+                f._subQuery = _subQuery.clone();
+            }
+            if (_leftOn != null && _leftSide != null && _rightOn != null && _rightSide != null)
+            {
+                f._leftSide  = _leftSide.clone();
+                f._leftOn    = (SelectItem[]) _leftOn.Clone();
+                f._rightSide = _rightSide.clone();
+                f._rightOn   = (SelectItem[]) _rightOn.Clone();
+            }
+            return f;
+        } // clone()
 
-        protected override void decorateIdentity(NList<Object> identifiers)
+        public override void decorateIdentity(NList<Object> identifiers)
         {
             identifiers.add(_table);
             identifiers.add(_alias);
@@ -416,5 +409,5 @@ namespace org.apache.metamodel.query
         {
             throw new NotImplementedException();
         }
-    }
-}
+    } // FromItem class
+} // org.apache.metamodel.query

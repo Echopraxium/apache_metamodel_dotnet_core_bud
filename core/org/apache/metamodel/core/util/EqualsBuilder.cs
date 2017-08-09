@@ -1,4 +1,4 @@
-﻿
+﻿// https://github.com/apache/metamodel/blob/b0cfe3aed447769f752743ac1753ebed90adaad2/core/src/main/java/org/apache/metamodel/util/EqualsBuilder.java
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -20,7 +20,7 @@
 using org.apache.metamodel.j2n.slf4j;
 using System;
 
-namespace org.apache.metamodel.util
+namespace org.apache.metamodel.core.util
 {
     /**
      * A helper class for implementing equals(...) methods.
@@ -28,18 +28,18 @@ namespace org.apache.metamodel.util
     public sealed class EqualsBuilder
     {
         private static readonly NLogger logger = NLoggerFactory.getLogger(typeof(EqualsBuilder).Name);
+
 	    private bool _equals = true;
 
         public EqualsBuilder append(bool b)
         {
             logger.debug("append({})", b);
-
             if (_equals)
             {
                 _equals = b;
             }
             return this;
-        } // constructor
+        }
 
         public EqualsBuilder append(Object o1, Object o2)
         {
@@ -48,7 +48,7 @@ namespace org.apache.metamodel.util
                 _equals = equals(o1, o2);
             }
             return this;
-        } // append()
+        }
 
         public static bool equals(Object obj1, Object obj2)
         {
@@ -64,33 +64,31 @@ namespace org.apache.metamodel.util
 
             Type class1 = obj1.GetType();
             Type class2 = obj2.GetType();
-
             if (class1.IsArray)
             {
-                if ( ! class2.IsArray)
+                if (! class2.IsArray)
                 {
                     return false;
                 }
                 else
                 {
-                    Type componentType1 = class1.GetElementType();   // class1.getComponentType()
-                    Type componentType2 = class2.GetElementType();   // class1.getComponentType()
-                    if ( ! componentType1.Equals(componentType2))
+                    Type componentType1 = class1.GetElementType();
+                    Type componentType2 = class2.GetElementType();
+                    if (!componentType1.Equals(componentType2))
                     {
                         return false;
                     }
 
-                    int length1 = ((object)obj1 as Array).GetLength(1);  // Array.getLength(obj1);
-                    int length2 = ((object)obj2 as Array).GetLength(1);  // Array.getLength(obj2);
+                    int length1 = ((Array) obj1).Length;
+                    int length2 = ((Array) obj2).Length;
                     if (length1 != length2)
                     {
                         return false;
                     }
-
                     for (int i = 0; i < length1; i++)
                     {
-                        Object elem1 = ((object)obj1 as Array).GetValue(i);  // Array.get(obj1, i);
-                        Object elem2 = ((object)obj2 as Array).GetValue(i);  // Array.get(obj2, i);
+                        Object elem1 = ((Array) obj1).GetValue(i);
+                        Object elem2 = ((Array) obj2).GetValue(i);
                         if (!equals(elem1, elem2))
                         {
                             return false;
@@ -115,4 +113,4 @@ namespace org.apache.metamodel.util
             return _equals;
         }
     } // EqualsBuilder class
-} // org.apache.metamodel.util namespace
+} // org.apache.metamodel.core.util

@@ -18,7 +18,6 @@
 */
 // https://github.com/apache/metamodel/blob/master/core/src/main/java/org/apache/metamodel/util/HasNameMapper.java
 using org.apache.metamodel.j2n.attributes;
-using System;
 
 namespace org.apache.metamodel.util
 {
@@ -28,7 +27,7 @@ namespace org.apache.metamodel.util
      * {@link CollectionUtils#map(Iterable, Func)}.
      */
     [NSerializableAttribute]
-    public sealed class HasNameMapper : Func<HasName, string> //, ISerializable
+    public sealed class HasNameMapper : NFunc<HasName, string> //, ISerializable
     {
         // warning CS0414
         #pragma warning disable 0414

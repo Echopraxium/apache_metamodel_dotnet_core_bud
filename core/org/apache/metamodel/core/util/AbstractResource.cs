@@ -31,7 +31,7 @@ namespace org.apache.metamodel.util
      */
     public abstract class AbstractResource : Resource
     {
-        public void read(CsAction<NInputStream> readCallback)
+        public void read(NAction<NInputStream> readCallback)
         {
             NInputStream in_stream = read();
             try
@@ -48,7 +48,7 @@ namespace org.apache.metamodel.util
             }
         } // read()
 
-        public E read<E>(Func<NInputStream, E> readCallback)
+        public E read<E>(NFunc<NInputStream, E> readCallback)
         {
             NInputStream in_stream = read();
             try
@@ -66,7 +66,7 @@ namespace org.apache.metamodel.util
             }
         } // read()
 
-        public void write(CsAction<NOutputStream> writeCallback) // throws ResourceException
+        public void write(NAction<NOutputStream> writeCallback) // throws ResourceException
         {
             NOutputStream out_stream = write();
             try
@@ -83,7 +83,7 @@ namespace org.apache.metamodel.util
             }
         } // write()
 
-        public void append(CsAction<NOutputStream> appendCallback) // throws ResourceException
+        public void append(NAction<NOutputStream> appendCallback) // throws ResourceException
         {
             NOutputStream out_stream = append();
             try
@@ -150,7 +150,7 @@ namespace org.apache.metamodel.util
             throw new NotImplementedException();
         }
 
-        public void append(CsAction<NInputStream> appendCallback)
+        public void append(NAction<NInputStream> appendCallback)
         {
             throw new NotImplementedException();
         }

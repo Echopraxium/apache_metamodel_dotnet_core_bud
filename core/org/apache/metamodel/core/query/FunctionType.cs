@@ -39,7 +39,7 @@ namespace org.apache.metamodel.query
         //}
     } // FunctionType class
 
-    public abstract class FunctionTypeExt : FunctionType
+    public abstract class FunctionTypeConstants : FunctionType
     {
         //[J2Cs: missing dependency; comment out]
         public static readonly AggregateFunction COUNT;      // = new CountAggregateFunction();
@@ -58,5 +58,5 @@ namespace org.apache.metamodel.query
 
         public abstract ColumnType getExpectedColumnType(ColumnType type);
         public abstract string getFunctionName();
-    } // FunctionTypeExt class
+    } // FunctionTypeConstants class
 } // org.apache.metamodel.query namespace

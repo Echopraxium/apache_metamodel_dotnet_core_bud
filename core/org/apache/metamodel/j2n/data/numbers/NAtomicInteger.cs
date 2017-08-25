@@ -1,4 +1,7 @@
-﻿/**
+﻿
+// https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/atomic/AtomicInteger.html
+using System.Threading;
+/**
 * Licensed to the Apache Software Foundation (ASF) under one
 * or more contributor license agreements.  See the NOTICE file
 * distributed with this work for additional information
@@ -16,7 +19,6 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-// https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/atomic/AtomicInteger.html
 namespace org.apache.metamodel.j2n.data.numbers
 {
     public class NAtomicInteger : NInteger
@@ -24,5 +26,16 @@ namespace org.apache.metamodel.j2n.data.numbers
         public NAtomicInteger(int value_arg) : base(value_arg)
 	    {
         } // constructor
+
+        public int getAndIncrement()
+        {
+           return Interlocked.Increment(ref this.Value.Int);
+        } // getAndIncrement()
+
+        public int incrementAndGet()
+        {
+            Interlocked.Increment(ref this.Value.Int);
+            return this.Value.Int;
+        } // incrementAndGet()
     } // NAtomicInteger class
 } // org.apache.metamodel.j2n.data.numbers namespace

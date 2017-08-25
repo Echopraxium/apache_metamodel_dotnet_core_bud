@@ -25,6 +25,7 @@ using org.apache.metamodel.j2n.reflection;
 using org.apache.metamodel.query;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
 using System.Xml;
 using System.Xml.Serialization;
@@ -157,7 +158,8 @@ namespace org.apache.metamodel.core.data
          */
         // @Deprecated
         public DefaultRow(List<SelectItem> items, Object[] values) : this(items, values, null)
-        {   
+        {
+            Debug.WriteLine("new DefaultRow");
         } // constructor
 
         /**
@@ -224,10 +226,10 @@ namespace org.apache.metamodel.core.data
          */
         private void readObject(Object o, NInputStream stream) // throws Exception
         {
-            XmlSerializer serializer = new XmlSerializer(o.GetType());
-            object      read_data   = serializer.Deserialize(stream); //.readFields();
-            FieldInfo[] fields      = read_data.GetType().GetFields();
-            FieldInfo   items_field = NTypeUtils.getField(read_data.GetType(), "_items");
+            XmlSerializer serializer  = new XmlSerializer(o.GetType());
+            object        read_data   = serializer.Deserialize(stream); //.readFields();
+            FieldInfo[]   fields      = read_data.GetType().GetFields();
+            FieldInfo     items_field = NTypeUtils.getField(read_data.GetType(), "_items");
 
             NGetField get_field = new NGetField(read_data, fields);
 

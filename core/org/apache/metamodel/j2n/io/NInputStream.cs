@@ -18,17 +18,67 @@
 */
 using Microsoft.Win32.SafeHandles;
 using System.IO;
+using org.apache.metamodel.j2n.data;
+using System.Diagnostics;
 
 namespace org.apache.metamodel.j2n.io
 {
-    public  class NInputStream : FileStream
+    public class NInputStream : NFile
     {
+        #region ---------- Contructors ----------
+        public NInputStream(string path, FileMode mode) : base(path, mode)
+        {
+            Debug.WriteLine("NInputStream(String, FileMode) path='" + path + "'");
+            _path = path;
+            _mode = FileMode.Open;
+        } // constructor
+
         public NInputStream(SafeFileHandle fh, FileAccess access): base(fh, access)
         {
+            Debug.WriteLine("NInputStream(SafeFileHandle, FileAccess)");
+            _mode = FileMode.Open;
         } // constructor
 
         public NInputStream(SafeFileHandle fh, FileAccess access, int length) : base(fh, access, length)
         {
+            Debug.WriteLine("NInputStream(SafeFileHandle, FileAccess, int)");
+            _mode = FileMode.Open;
         } // constructor
+        #endregion Contructors
+
+
+        public override bool CanRead  => true;
+
+        public override bool CanWrite => false;
+
+
+        public byte[] readFile()
+        {
+            Debug.WriteLine("NInputStream.readFile()  _path='" + _path + "'");
+            byte[] buffer = new byte[0];
+
+            if (_path.IsEmpty())
+                return buffer;
+
+            FileStream fileStream = this; // new FileStream(_path, _mode, FileAccess.Read);
+            //FileStream fileStream = new FileStream(_path, _mode, FileAccess.Read);
+            try
+            {
+                int length = (int) fileStream.Length;  // get file length
+                buffer     = new byte[length];            // create buffer
+                int count;                            // actual number of bytes read
+                int sum = 0;                          // total number of bytes read
+
+                // read until Read method returns 0 (end of the stream has been reached)
+                while ((count = fileStream.Read(buffer, sum, length - sum)) > 0)
+                    sum += count;  // sum is a buffer offset for next reading
+            }
+            finally
+            {
+                //fileStream.close();
+                this.Position = 0;
+            }
+            return buffer;
+        } // readFile()
     } // CsInputStream class
 } // org.apache.metamodel.j2n.io namespace

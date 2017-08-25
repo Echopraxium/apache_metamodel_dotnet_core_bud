@@ -20,6 +20,7 @@
 using org.apache.metamodel.schema;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace org.apache.metamodel.core.schema
 {
@@ -45,6 +46,7 @@ namespace org.apache.metamodel.core.schema
 
         public MutableTable() : base()
         {
+            Debug.WriteLine("new MutableTable");
             _columns       = new List<Column>();
             _relationships = new List<Relationship>();
         }
@@ -102,14 +104,14 @@ namespace org.apache.metamodel.core.schema
         protected List<Relationship> getRelationshipsInternal()
         {
             return _relationships;
-        }
+        } // getRelationshipsInternal()
 
         // @Override
         public override Column[] getColumns()
         {
             List<Column> columns = getColumnsInternal();
             return columns.ToArray(); // (new Column[columns.Count]);
-        }
+        } // getColumns()
 
         public MutableTable setColumns(params Column[] columns)
         {
@@ -129,13 +131,13 @@ namespace org.apache.metamodel.core.schema
                 _columns.Add(column);
             }
             return this;
-        }
+        } // setColumns()
 
         public MutableTable addColumn(Column column)
         {
             _columns.Add(column);
             return this;
-        }
+        } // addColumn()
 
         public MutableTable addColumn(int index, Column column)
         {
@@ -184,7 +186,7 @@ namespace org.apache.metamodel.core.schema
          * Protected method for adding a relationship to this table. Should not be
          * used. Use Relationship.createRelationship(Column[], Column[]) instead.
          */
-        protected void addRelationship(Relationship relation)
+        public void addRelationship(Relationship relation)
         {
             foreach (Relationship existingRelationship in _relationships)
             {
@@ -201,7 +203,7 @@ namespace org.apache.metamodel.core.schema
          * Protected method for removing a relationship from this table. Should not
          * be used. Use Relationship.remove() instead.
          */
-        protected MutableTable removeRelationship(Relationship relation)
+        public MutableTable removeRelationship(Relationship relation)
         {
             _relationships.Remove(relation);
             return this;

@@ -61,7 +61,7 @@ namespace org.apache.metamodel.util
                 }
                 catch (ArgumentException e)
                 {
-                    logger.warn("Could not convert String '{}' to boolean, returning false", o);
+                    logger.warn("Could not convert String '{0}' to boolean, returning false", o);
                     return false;
                 }
             }
@@ -71,7 +71,7 @@ namespace org.apache.metamodel.util
                 return i >= 1;
             }
 
-            logger.warn("Could not convert '{}' to boolean, returning false", o);
+            logger.warn("Could not convert '{0}' to boolean, returning false", o);
             return false;
         } // toBoolean()
 

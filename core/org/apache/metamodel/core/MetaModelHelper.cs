@@ -360,8 +360,7 @@ namespace org.apache.metamodel.core
                 Array.Copy(ds1selects, 0, leftOrderedSelects, 0, ds1selects.Length);
                 Array.Copy(ds2selects, 0, leftOrderedSelects, ds1selects.Length, ds2selects.Length);
 
-                // We will reuse the left join algorithm (but switch the datasets
-                // around)
+                // We will reuse the left join algorithm (but switch the datasets around)
                 DataSet dataSet = getLeftJoin(ds2, ds1, onConditions);
 
                 dataSet = getSelection(leftOrderedSelects, dataSet);
@@ -382,7 +381,7 @@ namespace org.apache.metamodel.core
             {
                 QueryParser parser = new QueryParser(dc, queryString);
                 return parser.parse();
-            }
+            } // parseQuery()
 
             /**
              * Examines a query and extracts an array of FromItem's that refer
@@ -485,7 +484,7 @@ namespace org.apache.metamodel.core
 
             public static DataSet getCarthesianProduct(DataSet[] fromDataSets, params FilterItem[] filterItems)
             {
-                return getCarthesianProduct(fromDataSets,filterItems.toList<FilterItem>());
+                return getCarthesianProduct(fromDataSets,filterItems.AsList<FilterItem>());
             } // getCarthesianProduct()
 
             public static DataSet getCarthesianProduct(DataSet[] fromDataSets, IEnumerable<FilterItem> whereItems)

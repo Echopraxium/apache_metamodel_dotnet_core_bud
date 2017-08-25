@@ -27,6 +27,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Collections;
 using org.apache.metamodel.j2n.data;
+using System.Diagnostics;
 
 //import java.util.ArrayList;
 //import java.util.Arrays;
@@ -59,15 +60,18 @@ namespace org.apache.metamodel.core.data
         // @Deprecated
         public AbstractDataSet()
         {
+            Debug.WriteLine("new AbstractDataSet");
             _header = null;
         } // constructor
 
         public AbstractDataSet(SelectItem[] selectItems) : this(NArrays.AsList<SelectItem>(selectItems))
-        {        
+        {
+            Debug.WriteLine("new AbstractDataSet(SelectItem[])");
         } // constructor
 
         public AbstractDataSet(List<SelectItem> selectItems) : this(new CachingDataSetHeader(selectItems))
-        {  
+        {
+            Debug.WriteLine("new AbstractDataSet(List<SelectItem>)");
         } // constructor
 
         /**

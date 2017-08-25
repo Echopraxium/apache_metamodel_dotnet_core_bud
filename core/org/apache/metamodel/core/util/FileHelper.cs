@@ -611,7 +611,8 @@ namespace org.apache.metamodel.util
             //{
             //    throw new InvalidOperationException(e.Message);
             //}
-            return new NInputStream(stream_arg.SafeFileHandle, FileAccess.Read);
+            //return new NInputStream(stream_arg.SafeFileHandle, FileAccess.Read);
+            return stream_arg;
         } // getInputStream()
 
         public static byte[] readAsBytes(NInputStream input_stream)

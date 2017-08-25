@@ -76,7 +76,7 @@ namespace org.apache.metamodel.core.query.parser
                 }
 
                 String subQueryString = itemToken.Substring(parenthesisStart + 1, parenthesisEnd);
-                logger.debug("Parsing sub-query: {}", subQueryString);
+                logger.debug("Parsing sub-query: {0}", subQueryString);
 
                 Query subQuery = new QueryParser(_dataContext, subQueryString).parse();
                 fromItem = new FromItem(subQuery);

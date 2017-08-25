@@ -232,8 +232,7 @@ https://www.jmdoudoux.fr/java/dej/chap-java_dotnet.htm
         would have been useful it seems but missing in .Net Core 1.1)
 
 * java: File
-  C#:   use either 'NInputStream', 'NOutputStream', 'FileStream'
-                   'File', 'Path' and 'Directory' depending on Java code semantic
+  C#:   NFile
 
 * java: Writer
   C#:   StreamWriter

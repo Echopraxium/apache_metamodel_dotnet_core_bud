@@ -8,7 +8,7 @@ Thumbs.db
 .vscode/
 .vs/
 *.user
-*.sln
+#*.sln
 
 # dotnet build files
 obj/

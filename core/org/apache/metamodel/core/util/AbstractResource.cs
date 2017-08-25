@@ -102,55 +102,53 @@ namespace org.apache.metamodel.util
 
         public override String ToString()
         {
-            return this.GetType().Name + "[" + getQualifiedPath() + "]";
-        }
+            string out_str = this.GetType().Name + "[" + getQualifiedPath() + "]";
+            return out_str;
+        } // ToString()
 
-        public string getQualifiedPath()
+        public abstract string getQualifiedPath();
+        //{
+        //    throw new NotImplementedException();
+        //}
+
+        public virtual bool isReadOnly()
         {
             throw new NotImplementedException();
         }
 
-        public bool isReadOnly()
+        public abstract bool isExists();
+        //{
+        //    throw new NotImplementedException();
+        //}
+
+        public virtual long getSize()
         {
             throw new NotImplementedException();
         }
 
-        public bool isExists()
+        public virtual long getLastModified()
         {
             throw new NotImplementedException();
         }
 
-        public long getSize()
+        public virtual NOutputStream write()
         {
             throw new NotImplementedException();
         }
 
-        public long getLastModified()
+        public virtual NOutputStream append()
         {
             throw new NotImplementedException();
         }
 
-        public NOutputStream write()
-        {
-            throw new NotImplementedException();
-        }
+        public abstract NInputStream read();
 
-        public NOutputStream append()
-        {
-            throw new NotImplementedException();
-        }
+        public abstract string getName();
+        //{
+        //    throw new NotImplementedException();
+        //} // getName()
 
-        public NInputStream read()
-        {
-            throw new NotImplementedException();
-        }
-
-        public string getName()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void append(NAction<NInputStream> appendCallback)
+        public virtual void append(NAction<NInputStream> appendCallback)
         {
             throw new NotImplementedException();
         }

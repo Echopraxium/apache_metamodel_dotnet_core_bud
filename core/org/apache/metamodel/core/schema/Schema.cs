@@ -18,6 +18,7 @@
 */
 // https://github.com/apache/metamodel/blob/master/core/src/main/java/org/apache/metamodel/schema/Schema.java
 using org.apache.metamodel.util;
+using System.Collections.Generic;
 
 namespace org.apache.metamodel.schema
 {
@@ -60,14 +61,14 @@ namespace org.apache.metamodel.schema
          * 
          * @return an array of table names.
          */
-        string[] getTableNames();
+        string[] getTableNames(bool dummy_arg_for_covariance_emulation);
 
         /**
          * Gets all tables in this Schema.
          * 
          * @return the tables that reside in the schema
          */
-        Table[] getTables();
+        Table[] getTables(bool dummy_arg_for_covariance_emulation);
 
         /**
          * Gets all tables in this Schema of a particular type.
@@ -77,7 +78,10 @@ namespace org.apache.metamodel.schema
          * @return an array of tables in this schema that matches the specified
          *         type.
          */
-        Table[] getTables(TableType type);
+        // Emulate return type covariance
+        //[J2N] return type covariance issue (conflict with with Table[] getTables(TableType type))
+        // https://stackoverflow.com/questions/1048884/c-overriding-return-types
+        Table[] getTables(TableType type, bool dummy_arg_for_covariance_emulation);
 
         /**
          * Gets a table by index. Use {@link #getTableCount()} to get the (0-based)
@@ -107,7 +111,8 @@ namespace org.apache.metamodel.schema
          * 
          * @return an array of relationships.
          */
-        Relationship[] getRelationships();
+        //Relationship[] getRelationships();
+        IList<Relationship> getRelationships();
 
         /**
          * Gets the number of relationships to and from this Schema.

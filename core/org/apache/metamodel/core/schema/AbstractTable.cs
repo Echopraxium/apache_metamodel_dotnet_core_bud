@@ -23,6 +23,7 @@ using org.apache.metamodel.schema;
 using org.apache.metamodel.util;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 //import java.util.ArrayList;
@@ -49,6 +50,11 @@ namespace org.apache.metamodel.core.schema
             private static readonly long serialVersionUID = 1L;
 
             private static readonly NLogger logger = NLoggerFactory.getLogger(typeof(AbstractTable).Name);
+
+            public AbstractTable()
+            {
+                Debug.WriteLine("new AbstractTable");
+            }
 
             // @Override
             public int getColumnCount()
@@ -172,7 +178,8 @@ namespace org.apache.metamodel.core.schema
                     return null;
                 }
 
-                List<Column> foundColumns = new List<Column>(1);
+                List<Column> foundColumns       = new List<Column>(1);
+                List<string> found_column_names = new List<string>(1);
 
                 // Search for column matches, case insensitive.
                 foreach (Column column in getColumns())
@@ -181,6 +188,7 @@ namespace org.apache.metamodel.core.schema
                     if (columnName.Equals(candidateName, StringComparison.CurrentCultureIgnoreCase))
                     {
                         foundColumns.Add(column);
+                        found_column_names.Add(candidateName);
                     }
                 }
 
@@ -188,7 +196,8 @@ namespace org.apache.metamodel.core.schema
 
                 if (logger.isDebugEnabled())
                 {
-                    logger.debug("Found {} column(s) matching '{}': {}", new Object[] { numColumns, columnName, foundColumns });
+                    //logger.debug("Found {} column(s) matching '{}': {}", new Object[] { numColumns, columnName, foundColumns });
+                    logger.debug("Found {0} column(s) matching '{1}': {2}", numColumns, columnName, string.Join(",", found_column_names));                   
                 }
 
                 if (numColumns == 0)

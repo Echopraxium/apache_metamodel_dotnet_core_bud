@@ -1,17 +1,4 @@
 ﻿
-// https://github.com/apache/metamodel/blob/b0cfe3aed447769f752743ac1753ebed90adaad2/core/src/main/java/org/apache/metamodel/query/builder/SatisfiedQueryBuilder.java
-//import org.apache.metamodel.DataContext;
-//import org.apache.metamodel.data.DataSet;
-//import org.apache.metamodel.query.CompiledQuery;
-//import org.apache.metamodel.query.FilterItem;
-//import org.apache.metamodel.query.FunctionType;
-//import org.apache.metamodel.query.Query;
-//import org.apache.metamodel.query.ScalarFunction;
-//import org.apache.metamodel.schema.Column;
-
-using org.apache.metamodel.core.data;
-using org.apache.metamodel.schema;
-using System.Collections.Generic;
 /**
 * Licensed to the Apache Software Foundation (ASF) under one
 * or more contributor license agreements.  See the NOTICE file
@@ -30,6 +17,13 @@ using System.Collections.Generic;
 * specific language governing permissions and limitations
 * under the License.
 */
+// https://github.com/apache/metamodel/blob/b0cfe3aed447769f752743ac1753ebed90adaad2/core/src/main/java/org/apache/metamodel/query/builder/SatisfiedQueryBuilder.java
+using org.apache.metamodel.core.data;
+using org.apache.metamodel.core.query;
+using org.apache.metamodel.core.query.builder;
+using org.apache.metamodel.schema;
+using System.Collections.Generic;
+
 namespace org.apache.metamodel.query.builder
 {
     /**
@@ -38,12 +32,12 @@ namespace org.apache.metamodel.query.builder
      * 
      * @param <B>
      */
-    public interface SatisfiedQueryBuilder<B> //: SatisfiedQueryBuilder<object>> 
+    public interface SatisfiedQueryBuilder
     {
 
         //ColumnSelectBuilder<B> select(Column column);
 
-        SatisfiedSelectBuilder<B> select(params Column[] columns);
+        SatisfiedSelectBuilder select(params Column[] columns);
 
         /**
          * Sets the offset (number of rows to skip) of the query that is being
@@ -56,7 +50,7 @@ namespace org.apache.metamodel.query.builder
          *            the number of rows to skip
          * @return
          */
-        SatisfiedQueryBuilder<B> offset(int offset);
+        SatisfiedQueryBuilder offset(int offset);
 
         /**
          * Sets the first row of the query that is being built.
@@ -66,7 +60,7 @@ namespace org.apache.metamodel.query.builder
          * @param firstRow
          * @return
          */
-        SatisfiedQueryBuilder<B> firstRow(int firstRow);
+        SatisfiedQueryBuilder firstRow(int firstRow);
 
         /**
          * Sets the limit (aka. max rows) of the query that is being built.
@@ -74,7 +68,7 @@ namespace org.apache.metamodel.query.builder
          * @param limit
          * @return
          */
-        SatisfiedQueryBuilder<B> limit(int limit);
+        SatisfiedQueryBuilder limit(int limit);
 
         /**
          * Sets the max rows (aka. limit) of the query that is being built.
@@ -82,39 +76,39 @@ namespace org.apache.metamodel.query.builder
          * @param maxRows
          * @return
          */
-        SatisfiedQueryBuilder<B> maxRows(int maxRows);
+        SatisfiedQueryBuilder maxRows(int maxRows);
 
-        FunctionSelectBuilder<B> select(FunctionType function, Column column);
+        FunctionSelectBuilder select(FunctionType function, Column column);
 
-        SatisfiedQueryBuilder<object> select(FunctionType function, string columnName);
+        SatisfiedQueryBuilder select(FunctionType function, string columnName);
 
-        //CountSelectBuilder<B> selectCount();
+        SatisfiedSelectBuilder selectCount();
 
-        //ColumnSelectBuilder<B> select(string columnName);
+        ColumnSelectBuilder select(string columnName);
 
-        //WhereBuilder<B> where(Column column);
+        WhereBuilder where(Column column);
 
-        //WhereBuilder<B> where(string columnName);
+        WhereBuilder where(string columnName);
 
-        //WhereBuilder<B> where(ScalarFunction function, Column column);
+        WhereBuilder where(ScalarFunction function, Column column);
 
-        //WhereBuilder<B> where(ScalarFunction function, string columnName);
+        WhereBuilder where(ScalarFunction function, string columnName);
 
-        SatisfiedQueryBuilder<B> where(params FilterItem[] filters);
+        SatisfiedQueryBuilder where(params FilterItem[] filters);
 
-        SatisfiedQueryBuilder<B> where(IEnumerable<FilterItem> filters);
+        SatisfiedQueryBuilder where(IEnumerable<FilterItem> filters);
 
-        //SatisfiedOrderByBuilder<B> orderBy(String columnName);
+        SatisfiedOrderByBuilder orderBy(string columnName);
 
-        //SatisfiedOrderByBuilder<B> orderBy(Column column);
+        SatisfiedOrderByBuilder orderBy(Column column);
 
-        //GroupedQueryBuilder groupBy(string columnName);
+        GroupedQueryBuilder groupBy(string columnName);
 
-        //GroupedQueryBuilder groupBy(params string[] columnNames);
+        GroupedQueryBuilder groupBy(params string[] columnNames);
 
-        //GroupedQueryBuilder groupBy(Column column);
+        GroupedQueryBuilder groupBy(Column column);
 
-        //GroupedQueryBuilder groupBy(params Column[] columns);
+        GroupedQueryBuilder groupBy(params Column[] columns);
 
         /**
          * Gets the built query as a {@link Query} object. Typically the returned
@@ -125,7 +119,7 @@ namespace org.apache.metamodel.query.builder
          */
         Query toQuery();
 
-        //CompiledQuery compile();
+        CompiledQuery compile();
 
         /**
          * Executes the built query. This call is similar to calling

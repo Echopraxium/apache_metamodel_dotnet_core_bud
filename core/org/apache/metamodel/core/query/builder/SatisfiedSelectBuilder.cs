@@ -3,6 +3,7 @@
 //import org.apache.metamodel.query.FunctionType;
 //import org.apache.metamodel.schema.Column;
 
+using org.apache.metamodel.core.query.builder;
 using org.apache.metamodel.schema;
 /**
 * Licensed to the Apache Software Foundation (ASF) under one
@@ -24,11 +25,11 @@ using org.apache.metamodel.schema;
 */
 namespace org.apache.metamodel.query.builder
 {
-    public interface SatisfiedSelectBuilder<B> : SatisfiedQueryBuilder<B> // where B : SatisfiedQueryBuilder 
+    public interface SatisfiedSelectBuilder : SatisfiedQueryBuilder
     {
-        //ColumnSelectBuilder<B>    And(Column column);
-        SatisfiedSelectBuilder<B>   And(params Column[] columns);
-        //FunctionSelectBuilder<B>  And(FunctionType function, Column column);
-        SatisfiedSelectBuilder<B>   And(string columnName);
+        ColumnSelectBuilder      And(Column column);
+        SatisfiedSelectBuilder   And(params Column[] columns);
+        FunctionSelectBuilder    And(FunctionType function, Column column);
+        SatisfiedSelectBuilder   And(string columnName);
     } // SatisfiedSelectBuilder interface
 } // org.apache.metamodel.query.builder namespace

@@ -33,10 +33,10 @@ namespace org.apache.metamodel.core.data
     {
         private static readonly long serialVersionUID = 1L;
 
-        public virtual DataSetHeader getHeader()
-        {
-            throw new NotImplementedException("AbstractRow.getHeader()");
-        }
+        public abstract DataSetHeader getHeader();
+        //{
+        //    throw new NotImplementedException("AbstractRow.getHeader()");
+        //}
 
         // @Override
         public virtual int hashCode()
@@ -121,7 +121,7 @@ namespace org.apache.metamodel.core.data
                 values[i] = getValue(i);
             }
             return values;
-        }
+        } // getValues()
 
         // @Override
         public virtual Object getValue(Column column)
@@ -132,7 +132,7 @@ namespace org.apache.metamodel.core.data
                 return null;
             }
             return getValue(index);
-        }
+        } // getValue()
 
         // @Override
         public int indexOf(SelectItem item)
@@ -142,7 +142,7 @@ namespace org.apache.metamodel.core.data
                 return -1;
             }
             return getHeader().indexOf(item);
-        }
+        } // indexOf()
 
         // @Override
         public int indexOf(Column column)
@@ -152,7 +152,7 @@ namespace org.apache.metamodel.core.data
                 return -1;
             }
             return getHeader().indexOf(column);
-        }
+        } // indexOf()
 
         // @Override
         public Row getSubSelection(SelectItem[] selectItems)
@@ -168,10 +168,10 @@ namespace org.apache.metamodel.core.data
         }
 
         // @Override
-        public int size()
+        public virtual int size()
         {
             return getHeader().size();
-        }
+        } // size()
 
         // @Override
         protected Row clone()

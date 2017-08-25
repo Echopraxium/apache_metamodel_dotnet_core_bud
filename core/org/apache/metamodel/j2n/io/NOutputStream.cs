@@ -21,10 +21,13 @@ using System.IO;
 */
 namespace org.apache.metamodel.j2n.io
 {
-    public class NOutputStream : FileStream
+    public class NOutputStream : NFile
     {        
         public NOutputStream(SafeFileHandle fh, FileAccess access): base(fh, access)
         {
         } // constructor
+
+        public override bool CanWrite => true;
+        public override bool CanRead  => false;
     } // NOutputStream class
 } // org.apache.metamodel.j2n.io namespace

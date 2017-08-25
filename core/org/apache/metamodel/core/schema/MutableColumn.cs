@@ -215,5 +215,5 @@ namespace org.apache.metamodel.core.schema
             _primaryKey = primaryKey;
             return this;
         }
-}
-}
+    } // MutableColumn class
+} // org.apache.metamodel.core.schema

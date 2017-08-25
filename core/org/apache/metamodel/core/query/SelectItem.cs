@@ -485,7 +485,7 @@ namespace org.apache.metamodel.query
             }
             else
             {
-                logger.debug("Could not resolve a reasonable super-query alias for SelectItem: {}", toSql());
+                logger.debug("Could not resolve a reasonable super-query alias for SelectItem: {0}", toSql());
                 return toStringNoAlias().ToString();
             }
         } // getSuperQueryAlias()
@@ -525,7 +525,7 @@ namespace org.apache.metamodel.query
             if (alias == null)
             {
                 alias = toStringNoAlias(includeSchemaInColumnPath).ToString();
-                logger.debug("Could not resolve a reasonable same-query alias for SelectItem: {}", toSql());
+                logger.debug("Could not resolve a reasonable same-query alias for SelectItem: {0}", toSql());
             }
             return alias;
         } // getSameQueryAlias()

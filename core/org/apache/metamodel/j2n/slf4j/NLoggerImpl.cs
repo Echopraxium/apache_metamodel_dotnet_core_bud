@@ -31,37 +31,30 @@ namespace org.apache.metamodel.j2n.slf4j
             Debug.WriteLine(msg);
         } // debug()
 
-        public void debug(string format, object arg, object arg2 = null)
+        public void debug(string format, params object[] args)
         {
-            if (arg2 == null)
-                Debug.WriteLine(format, arg);
-            else
-                Debug.WriteLine(format, arg, arg2);
+            string output = String.Format(format, args);                
+            Debug.WriteLine(output);
         } // debug()
 
-        public void warn(string format, object arg, object arg2 = null)
+        public void warn(string msg)
         {
-            if (arg2 == null)
-                Debug.WriteLine(format, arg);
-            else
-                Debug.WriteLine(format, arg, arg2);
+            Debug.WriteLine(msg);
         } // warn()
 
-        public void error(string format, object arg, object arg2 = null)
+        public void warn(string format, params object[] args)
         {
-            if (arg2 == null)
-              Debug.WriteLine(format, arg);
-            else
-              Debug.WriteLine(format, arg, arg2);
+            debug(format, args);
+        } // warn()
+
+        public void error(string format, params object[] args)
+        {
+            debug(format, args);
         } // error()
 
-        public void info(string msg, params object[] args)
+        public void info(string format, params object[] args)
         {
-           
-            if (args != null)
-                Debug.WriteLine(msg + "\n" + args.ToString());
-            else
-                Debug.WriteLine(msg);
+            debug(format, args);
         } // info()
 
         public bool isDebugEnabled()

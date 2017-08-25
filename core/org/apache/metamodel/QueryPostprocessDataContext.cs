@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+using org.apache.metamodel.core;
 using org.apache.metamodel.core.data;
 using org.apache.metamodel.core.query;
 using org.apache.metamodel.data;
@@ -24,47 +25,11 @@ using org.apache.metamodel.query;
 using org.apache.metamodel.schema;
 using System;
 using System.Collections.Generic;
-//import java.util.ArrayList;
-//import java.util.Arrays;
-//import java.util.Collections;
-//import java.util.HashMap;
-//import java.util.List;
-//import java.util.Map;
-//import org.apache.metamodel.convert.ConvertedDataSetInterceptor;
-//import org.apache.metamodel.convert.Converters;
-//import org.apache.metamodel.convert.HasReadTypeConverters;
-//import org.apache.metamodel.convert.TypeConverter;
-//import org.apache.metamodel.data.DataSet;
-//import org.apache.metamodel.data.DataSetHeader;
-//import org.apache.metamodel.data.DefaultRow;
-//import org.apache.metamodel.data.EmptyDataSet;
-//import org.apache.metamodel.data.FirstRowDataSet;
-//import org.apache.metamodel.data.InMemoryDataSet;
-//import org.apache.metamodel.data.Row;
-//import org.apache.metamodel.data.SimpleDataSetHeader;
-//import org.apache.metamodel.query.FilterItem;
-//import org.apache.metamodel.query.FromItem;
-//import org.apache.metamodel.query.GroupByItem;
-//import org.apache.metamodel.query.JoinType;
-//import org.apache.metamodel.query.OperatorType;
-//import org.apache.metamodel.query.OrderByItem;
-//import org.apache.metamodel.query.Query;
-//import org.apache.metamodel.query.ScalarFunction;
-//import org.apache.metamodel.query.SelectClause;
-//import org.apache.metamodel.query.SelectItem;
-//import org.apache.metamodel.schema.Column;
-//import org.apache.metamodel.schema.ColumnType;
-//import org.apache.metamodel.schema.MutableColumn;
-//import org.apache.metamodel.schema.MutableRelationship;
-//import org.apache.metamodel.schema.MutableSchema;
-//import org.apache.metamodel.schema.MutableTable;
-//import org.apache.metamodel.schema.Relationship;
-//import org.apache.metamodel.schema.Schema;
-//import org.apache.metamodel.schema.Table;
-//import org.apache.metamodel.schema.TableType;
-//import org.apache.metamodel.util.CollectionUtils;
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
+using org.apache.metamodel.j2n.collections;
+using org.apache.metamodel.core.schema;
+using org.apache.metamodel.util;
+using org.apache.metamodel.j2n.data.numbers;
+using org.apache.metamodel.core.convert;
 
 namespace org.apache.metamodel
 {
@@ -78,19 +43,17 @@ namespace org.apache.metamodel
      */
     public abstract class QueryPostprocessDataContext : AbstractDataContext //  implements HasReadTypeConverters
     {
-
         private static readonly NLogger logger = NLoggerFactory.getLogger(typeof(QueryPostprocessDataContext).Name);
 
         public static readonly String INFORMATION_SCHEMA_NAME = "information_schema";
-        // private readonly Dictionary<Column, TypeConverter<object, object>> _converters;
+        private readonly Dictionary<Column, TypeConverter<object, object>> _converters;
 
-        //public QueryPostprocessDataContext()
-        //{
-        //    super();
-        //    _converters = new HashSet<Column, TypeConverter<object, object>>();
-        //}
+        public QueryPostprocessDataContext() : base()
+        {
+            _converters = new Dictionary<Column, TypeConverter<object, object>>();
+        } // constructor
 
-        public override DataSet executeQuery(Query query)
+        public DataSet executeQuery(Query query)
         {
             List<SelectItem>  selectItems        = query.getSelectClause().getItems();
             List<FromItem>    fromItems          = query.getFromClause().getItems();
@@ -104,151 +67,153 @@ namespace org.apache.metamodel
             List<FilterItem>  havingItems  = query.getHavingClause().getItems();
             List<OrderByItem> orderByItems = query.getOrderByClause().getItems();
 
-            //    int firstRow = (query.getFirstRow() == null ? 1 : query.getFirstRow());
-            //    int maxRows = (query.getMaxRows() == null ? -1 : query.getMaxRows());
+            int firstRow = (query.getFirstRow() == null ? 1  : query.getFirstRow());
+            int maxRows =  (query.getMaxRows()  == null ? -1 : query.getMaxRows());
 
-            //    if (maxRows == 0)
-            //    {
-            //        // no rows requested - no reason to do anything
-            //        return new EmptyDataSet(selectItems);
-            //    }
+            if (maxRows == 0)
+            {
+                // no rows requested - no reason to do anything
+                return new EmptyDataSet(selectItems);
+            }
 
-            //    // check certain common query types that can often be optimized by
-            //    // subclasses
-            //    bool singleFromItem = fromItems.Count == 1;
-            //    bool noGrouping = groupByItems.isEmpty() && havingItems.isEmpty();
-            //    if (singleFromItem && noGrouping)
-            //    {
-            //        FromItem fromItem = query.getFromClause().getItem(0);
-            //        Table table = fromItem.getTable();
-            //        if (table != null)
-            //        {
-            //            // check for SELECT COUNT(*) queries
-            //            if (selectItems.Count == 1)
-            //            {
-            //                SelectItem selectItem = query.getSelectClause().getItem(0);
-            //                if (SelectItem.isCountAllItem(selectItem))
-            //                {
-            //                    bool functionApproximationAllowed = selectItem.isFunctionApproximationAllowed();
-            //                    if (isMainSchemaTable(table))
-            //                    {
-            //                        logger.debug("Query is a COUNT query with {} where items. Trying executeCountQuery(...)",
-            //                                whereItems.Count);
-            //                        CsNumber count = executeCountQuery(table, whereItems, functionApproximationAllowed);
-            //                        if (count == null)
-            //                        {
-            //                            logger.debug(
-            //                                    "DataContext did not return any count query results. Proceeding with manual counting.");
-            //                        }
-            //                        else
-            //                        {
-            //                            List<Row> data = new List<Row>(1);
-            //                            DataSetHeader header = new SimpleDataSetHeader(new SelectItem[] { selectItem });
-            //                            data.Add(new DefaultRow(header, new Object[] { count }));
-            //                            return new InMemoryDataSet(header, data);
-            //                        }
-            //                    }
-            //                }
-            //            }
+            // check certain common query types that can often be optimized by
+            // subclasses
+            bool singleFromItem = fromItems.Count == 1;
+            bool noGrouping     = groupByItems.IsEmpty() && havingItems.IsEmpty();
+            if (singleFromItem && noGrouping)
+            {
+                FromItem fromItem = query.getFromClause().getItem(0);
+                Table table = fromItem.getTable();
+                if (table != null)
+                {
+                    // check for SELECT COUNT(*) queries
+                    if (selectItems.Count == 1)
+                    {
+                        SelectItem selectItem = query.getSelectClause().getItem(0);
+                        if (SelectItem.isCountAllItem(selectItem))
+                        {
+                            bool functionApproximationAllowed = selectItem.isFunctionApproximationAllowed();
+                            if (isMainSchemaTable(table))
+                            {
+                                logger.debug("Query is a COUNT query with {} where items. Trying executeCountQuery(...)",
+                                             whereItems.Count);
+                                NNumber count = executeCountQuery(table, whereItems, functionApproximationAllowed);
+                                if (count == null)
+                                {
+                                    logger.debug(
+                                            "DataContext did not return any count query results. Proceeding with manual counting.");
+                                }
+                                else
+                                {
+                                    List<Row>     data   = new List<Row>(1);
+                                    DataSetHeader header = new SimpleDataSetHeader(new SelectItem[] { selectItem });
+                                    data.Add(new DefaultRow(header, new Object[] { count }));
+                                    return new InMemoryDataSet(header, data);
+                                }
+                            }
+                        }
+                    }
 
-            //            bool isSimpleSelect = isSimpleSelect(query.getSelectClause());
-            //            if (isSimpleSelect)
-            //            {
-            //                // check for lookup query by primary key
-            //                if (whereItems.Count == 1)
-            //                {
-            //                    FilterItem whereItem = whereItems[0];
-            //                    SelectItem selectItem = whereItem.getSelectItem();
-            //                    if (!whereItem.isCompoundFilter() && selectItem != null && selectItem.getColumn() != null)
-            //                    {
-            //                        Column column = selectItem.getColumn();
-            //                        if (column.isPrimaryKey() && OperatorType.EQUALS_TO.equals(whereItem.getOperator()))
-            //                        {
-            //                            logger.debug(
-            //                                    "Query is a primary key lookup query. Trying executePrimaryKeyLookupQuery(...)");
-            //                            if (table != null)
-            //                            {
-            //                                if (isMainSchemaTable(table))
-            //                                {
-            //                                    Object operand = whereItem.getOperand();
-            //                                    Row row = executePrimaryKeyLookupQuery(table, selectItems, column, operand);
-            //                                    if (row == null)
-            //                                    {
-            //                                        logger.debug(
-            //                                                "DataContext did not return any GET query results. Proceeding with manual lookup.");
-            //                                    }
-            //                                    else
-            //                                    {
-            //                                        DataSetHeader header = new SimpleDataSetHeader(selectItems);
-            //                                        return new InMemoryDataSet(header, row);
-            //                                    }
-            //                                }
-            //                            }
-            //                        }
-            //                    }
-            //                }
+                    bool is_simple_select = isSimpleSelect(query.getSelectClause());
+                    if (is_simple_select)
+                    {
+                        // check for lookup query by primary key
+                        if (whereItems.Count == 1)
+                        {
+                            FilterItem whereItem = whereItems[0];
+                            SelectItem selectItem = whereItem.getSelectItem();
+                            if (!whereItem.isCompoundFilter() && selectItem != null && selectItem.getColumn() != null)
+                            {
+                                Column column = selectItem.getColumn();
+                                if (column.isPrimaryKey() && OperatorType.EQUALS_TO.Equals(whereItem.getOperator()))
+                                {
+                                    logger.debug(
+                                            "Query is a primary key lookup query. Trying executePrimaryKeyLookupQuery(...)");
+                                    if (table != null)
+                                    {
+                                        if (isMainSchemaTable(table))
+                                        {
+                                            Object operand = whereItem.getOperand();
+                                            Row row = executePrimaryKeyLookupQuery(table, selectItems, column, operand);
+                                            if (row == null)
+                                            {
+                                                logger.debug(
+                                                       "DataContext did not return any GET query results. Proceeding with manual lookup.");
+                                            }
+                                            else
+                                            {
+                                                DataSetHeader header = new SimpleDataSetHeader(selectItems);
+                                                return new InMemoryDataSet(header, row);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
 
-            //                // check for simple queries with or without simple criteria
-            //                if (orderByItems.IsEmpty())
-            //                {
-            //                    // no WHERE criteria set
-            //                    if (whereItems.isEmpty())
-            //                    {
-            //                        DataSet dataSet = materializeTable(table, selectItems, firstRow, maxRows);
-            //                        return dataSet;
-            //                    }
+                        // check for simple queries with or without simple criteria
+                        if (orderByItems.IsEmpty())
+                        {
+                                DataSet ds = null;
 
-            //                    DataSet dataSet = materializeTable(table, selectItems, whereItems, firstRow, maxRows);
-            //                    return dataSet;
-            //                }
-            //            }
-            //        }
-            //    }
+                                // no WHERE criteria set
+                                if (whereItems.IsEmpty())
+                                {
+                                    ds = materializeTable(table, selectItems, firstRow, maxRows);
+                                    return ds;
+                                }
 
-            //    // Creates a list for all select items that are needed to execute query
-            //    // (some may only be used as part of a filter, but not shown in result)
-            //    List<SelectItem> workSelectItems = CollectionUtils.concat(true, selectItems, whereSelectItems,
-            //            groupBySelectItems, havingSelectItems, orderBySelectItems);
+                                ds = materializeTable(table, selectItems, whereItems, firstRow, maxRows);
+                                return ds;
+                            }
+                        }
+                    }
+                }
 
-            //    // Materialize the tables in the from clause
-            //    DataSet[] fromDataSets = new DataSet[fromItems.Count];
-            //    for (int i = 0; i < fromDataSets.length; i++)
-            //    {
-            //        FromItem fromItem = fromItems[i];
-            //        fromDataSets[i] = materializeFromItem(fromItem, workSelectItems);
-            //    }
+                // Creates a list for all select items that are needed to execute query
+                // (some may only be used as part of a filter, but not shown in result)
+                List<SelectItem> workSelectItems = CollectionUtils.concat(true, selectItems, whereSelectItems,
+                        groupBySelectItems, havingSelectItems, orderBySelectItems);
 
-            //    // Execute the query using the raw data
+                // Materialize the tables in the from clause
+                DataSet[] fromDataSets = new DataSet[fromItems.Count];
+                for (int i = 0; i < fromDataSets.Length; i++)
+                {
+                    FromItem fromItem = fromItems[i];
+                    fromDataSets[i] = materializeFromItem(fromItem, workSelectItems);
+                }
+
+                // Execute the query using the raw data
             DataSet dataSet = null; // MetaModelHelper.getCarthesianProduct(fromDataSets, whereItems);
 
-        //    // we can now exclude the select items imposed by the WHERE clause (and
-        //    // should, to make the aggregation process faster)
-        //    workSelectItems = CollectionUtils.concat(true, selectItems, groupBySelectItems, havingSelectItems,
-        //                                             orderBySelectItems);
+            // we can now exclude the select items imposed by the WHERE clause (and
+            // should, to make the aggregation process faster)
+            workSelectItems = CollectionUtils.concat(true, selectItems, groupBySelectItems, havingSelectItems,
+                                                     orderBySelectItems);
 
-        //    if (groupByItems.Count > 0)
-        //    {
-        //        dataSet = MetaModelHelper.getGrouped(workSelectItems, dataSet, groupByItems);
-        //    }
-        //    else
-        //    {
-        //        dataSet = MetaModelHelper.getAggregated(workSelectItems, dataSet);
-        //    }
-        //    dataSet = MetaModelHelper.getFiltered(dataSet, havingItems);
+            if (groupByItems.Count > 0)
+            {
+                dataSet = MetaModelHelper.getGrouped(workSelectItems, dataSet, groupByItems);
+            }
+            else
+            {
+                dataSet = MetaModelHelper.getAggregated(workSelectItems, dataSet);
+            }
+            dataSet = MetaModelHelper.getFiltered(dataSet, havingItems);
 
-        //    if (query.getSelectClause().isDistinct())
-        //    {
-        //        dataSet = MetaModelHelper.getSelection(selectItems, dataSet);
-        //        dataSet = MetaModelHelper.getDistinct(dataSet);
-        //        dataSet = MetaModelHelper.getOrdered(dataSet, orderByItems);
-        //    }
-        //    else
-        //    {
-        //        dataSet = MetaModelHelper.getOrdered(dataSet, orderByItems);
-        //        dataSet = MetaModelHelper.getSelection(selectItems, dataSet);
-        //    }
+            if (query.getSelectClause().isDistinct())
+            {
+                dataSet = MetaModelHelper.getSelection(selectItems, dataSet);
+                dataSet = MetaModelHelper.getDistinct(dataSet);
+                dataSet = MetaModelHelper.getOrdered(dataSet, orderByItems);
+            }
+            else
+            {
+                dataSet = MetaModelHelper.getOrdered(dataSet, orderByItems);
+                dataSet = MetaModelHelper.getSelection(selectItems, dataSet);
+            }
 
-        //    dataSet = MetaModelHelper.getPaged(dataSet, firstRow, maxRows);
+            dataSet = MetaModelHelper.getPaged(dataSet, firstRow, maxRows);
             return dataSet;
         } // executeQuery()
 
@@ -289,10 +254,10 @@ namespace org.apache.metamodel
          *            whether approximation is allowed or not.
          * @return the count of the particular table, or null if not available.
          */
-        //protected CsNumber executeCountQuery(Table table, List<FilterItem> whereItems, bool functionApproximationAllowed)
-        //{
-        //    return null;
-        //}
+        protected NNumber executeCountQuery(Table table, List<FilterItem> whereItems, bool functionApproximationAllowed)
+        {
+            return null;
+        } // executeCountQuery()
 
         /**
          * Executes a query which obtains a row by primary key (as defined by
@@ -317,185 +282,185 @@ namespace org.apache.metamodel
             return null;
         } // executePrimaryKeyLookupQuery()
 
-        //protected DataSet materializeFromItem(FromItem fromItem, List<SelectItem> selectItems)
-        //{
-        //    DataSet dataSet;
-        //    JoinType joinType = fromItem.getJoin();
-        //    if (fromItem.getTable() != null)
-        //    {
-        //        // We need to materialize a single table
-        //        Table table = fromItem.getTable();
-        //        List<SelectItem> selectItemsToMaterialize = new List<SelectItem>();
+        protected DataSet materializeFromItem(FromItem fromItem, List<SelectItem> selectItems)
+        {
+            DataSet dataSet;
+            JoinType joinType = fromItem.getJoin();
+            if (fromItem.getTable() != null)
+            {
+                // We need to materialize a single table
+                Table table = fromItem.getTable();
+                List<SelectItem> selectItemsToMaterialize = new List<SelectItem>();
 
-        //        foreach (SelectItem selectItem in selectItems)
-        //        {
-        //            FromItem selectedFromItem = selectItem.getFromItem();
-        //            if (selectedFromItem != null)
-        //            {
-        //                if (selectedFromItem.equals(fromItem))
-        //                {
-        //                    selectItemsToMaterialize.Add(selectItem.replaceFunction(null));
-        //                }
-        //            }
-        //            else
-        //            {
-        //                // the select item does not specify a specific
-        //                // from-item
-        //                Column selectedColumn = selectItem.getColumn();
-        //                if (selectedColumn != null)
-        //                {
-        //                    // we assume that if the table matches, we will use the
-        //                    // column
-        //                    if (selectedColumn.getTable() != null && selectedColumn.getTable().equals(table))
-        //                    {
-        //                        selectItemsToMaterialize.Add(selectItem.replaceFunction(null));
-        //                    }
-        //                }
-        //            }
-        //        }
+                foreach (SelectItem selectItem in selectItems)
+                {
+                    FromItem selectedFromItem = selectItem.getFromItem();
+                    if (selectedFromItem != null)
+                    {
+                       if (selectedFromItem.equals(fromItem))
+                       {
+                           selectItemsToMaterialize.Add(selectItem.replaceFunction(null));
+                       }
+                   }
+                   else
+                   {
+                      // the select item does not specify a specific
+                      // from-item
+                      Column selectedColumn = selectItem.getColumn();
+                      if (selectedColumn != null)
+                      {
+                          // we assume that if the table matches, we will use the
+                          // column
+                          if (selectedColumn.getTable() != null && selectedColumn.getTable().Equals(table))
+                          {
+                              selectItemsToMaterialize.Add(selectItem.replaceFunction(null));
+                          }
+                      }
+                  }
+              }
 
-        //        if (logger.isDebugEnabled())
-        //        {
-        //            logger.debug("calling materializeTable(" + table.getName() + "," + selectItemsToMaterialize + ",1,-1");
-        //        }
+              if (logger.isDebugEnabled())
+              {
+                  logger.debug("calling materializeTable(" + table.getName() + "," + selectItemsToMaterialize + ",1,-1");
+              }
 
-        //        // Dispatching to the concrete subclass of
-        //        // QueryPostprocessDataContextStrategy
-        //        dataSet = materializeTable(table, selectItemsToMaterialize, 1, -1);
+              // Dispatching to the concrete subclass of
+              // QueryPostprocessDataContextStrategy
+              dataSet = materializeTable(table, selectItemsToMaterialize, 1, -1);
 
-        //    }
-        //    else if (joinType != JoinType.None)
-        //    {
-        //        // We need to (recursively) materialize a joined FromItem
-        //        if (fromItem.getLeftSide() == null || fromItem.getRightSide() == null)
-        //        {
-        //            throw new ArgumentException("Joined FromItem requires both left and right side: " + fromItem);
-        //        }
-        //        DataSet[] fromItemDataSets = new DataSet[2];
+          }
+          else if (joinType != JoinType.None)
+          {
+              // We need to (recursively) materialize a joined FromItem
+              if (fromItem.getLeftSide() == null || fromItem.getRightSide() == null)
+              {
+                  throw new ArgumentException("Joined FromItem requires both left and right side: " + fromItem);
+              }
+              DataSet[] fromItemDataSets = new DataSet[2];
 
-        //        // materialize left side
-        //        List<SelectItem> leftOn = Arrays.asList(fromItem.getLeftOn());
-        //        fromItemDataSets[0] = materializeFromItem(fromItem.getLeftSide(),
-        //                CollectionUtils.concat(true, selectItems, leftOn));
+              // materialize left side
+              List<SelectItem> leftOn = NArrays.AsList(fromItem.getLeftOn());
+              fromItemDataSets[0] = materializeFromItem(fromItem.getLeftSide(),
+                      CollectionUtils.concat(true, selectItems, leftOn));
 
-        //        // materialize right side
-        //        List<SelectItem> rightOn = Arrays.asList(fromItem.getRightOn());
-        //        fromItemDataSets[1] = materializeFromItem(fromItem.getRightSide(),
-        //                                                  CollectionUtils.concat(true, selectItems, rightOn));
+              // materialize right side
+              List<SelectItem> rightOn = NArrays.AsList(fromItem.getRightOn());
+              fromItemDataSets[1] = materializeFromItem(fromItem.getRightSide(),
+                                                        CollectionUtils.concat(true, selectItems, rightOn));
 
-        //        FilterItem[] onConditions = new FilterItem[leftOn.Count];
-        //        for (int i = 0; i < onConditions.Length; i++)
-        //        {
-        //            FilterItem whereItem = new FilterItem(leftOn.get(i), OperatorType.EQUALS_TO, rightOn.get(i));
-        //            onConditions[i] = whereItem;
-        //        }
+              FilterItem[] onConditions = new FilterItem[leftOn.Count];
+              for (int i = 0; i < onConditions.Length; i++)
+              {
+                  FilterItem whereItem = new FilterItem(leftOn[i], OperatorType.EQUALS_TO, rightOn[i]);
+                  onConditions[i] = whereItem;
+              }
 
-        //        switch (joinType)
-        //        {
-        //            case JoinType.INNER:
-        //                dataSet = MetaModelHelper.getCarthesianProduct(fromItemDataSets, onConditions);
-        //                break;
-        //            case JoinType.LEFT:
-        //                dataSet = MetaModelHelper.getLeftJoin(fromItemDataSets[0], fromItemDataSets[1], onConditions);
-        //                break;
-        //            case JoinType.RIGHT:
-        //                dataSet = MetaModelHelper.getRightJoin(fromItemDataSets[0], fromItemDataSets[1], onConditions);
-        //                break;
-        //            default:
-        //                throw new ArgumentException("FromItem type not supported: " + fromItem);
-        //        }
-        //    }
-        //    else if (fromItem.getSubQuery() != null)
-        //    {
-        //        // We need to (recursively) materialize a subquery
-        //        dataSet = executeQuery(fromItem.getSubQuery());
-        //    }
-        //    else
-        //    {
-        //        throw new ArgumentException("FromItem type not supported: " + fromItem);
-        //    }
-        //    if (dataSet == null)
-        //    {
-        //        throw new ArgumentException("FromItem was not succesfully materialized: " + fromItem);
-        //    }
-        //    return dataSet;
-        //} // materializeFromItem()
+              switch (joinType)
+              {
+                  case JoinType.INNER:
+                      dataSet = MetaModelHelper.getCarthesianProduct(fromItemDataSets, onConditions);
+                      break;
+                  case JoinType.LEFT:
+                      dataSet = MetaModelHelper.getLeftJoin(fromItemDataSets[0], fromItemDataSets[1], onConditions);
+                      break;
+                  case JoinType.RIGHT:
+                      dataSet = MetaModelHelper.getRightJoin(fromItemDataSets[0], fromItemDataSets[1], onConditions);
+                      break;
+                  default:
+                      throw new ArgumentException("FromItem type not supported: " + fromItem);
+              }
+          }
+          else if (fromItem.getSubQuery() != null)
+          {
+              // We need to (recursively) materialize a subquery
+              dataSet = executeQuery(fromItem.getSubQuery());
+          }
+          else
+          {
+              throw new ArgumentException("FromItem type not supported: " + fromItem);
+          }
+          if (dataSet == null)
+          {
+              throw new ArgumentException("FromItem was not succesfully materialized: " + fromItem);
+          }
+          return dataSet;
+        } // materializeFromItem()
 
-        //protected DataSet materializeTable(Table table, List<SelectItem> selectItems,
-        //                                   List<FilterItem> whereItems, int firstRow, int maxRows)
-        //{
-        //    if (table == null)
-        //    {
-        //        throw new ArgumentException("Table cannot be null");
-        //    }
+        protected DataSet materializeTable(Table table, List<SelectItem> selectItems,
+                                           List<FilterItem> whereItems, int firstRow, int maxRows)
+        {
+            if (table == null)
+            {
+                throw new ArgumentException("Table cannot be null");
+            }
 
-        //    if (selectItems == null || selectItems.isEmpty())
-        //    {
-        //        // add any column (typically this occurs because of COUNT(*)
-        //        // queries)
-        //        Column[] columns = table.getColumns();
-        //        if (columns.Length == 0)
-        //        {
-        //            logger.warn("Queried table has no columns: {}", table);
-        //        }
-        //        else
-        //        {
-        //            selectItems.Add(new SelectItem(columns[0]));
-        //        }
-        //    }
+            if (selectItems == null || selectItems.IsEmpty())
+            {
+                // add any column (typically this occurs because of COUNT(*)
+                // queries)
+                Column[] columns = table.getColumns();
+                if (columns.Length == 0)
+                {
+                    logger.warn("Queried table has no columns: {}", table);
+                }
+                else
+                {
+                    selectItems.Add(new SelectItem(columns[0]));
+                }
+            }
 
-        //    Schema schema = table.getSchema();
-        //    String schemaName;
-        //    if (schema == null)
-        //    {
-        //        schemaName = null;
-        //    }
-        //    else
-        //    {
-        //        schemaName = schema.getName();
-        //    }
+            Schema schema = table.getSchema();
+            String schemaName;
+            if (schema == null)
+            {
+                schemaName = null;
+            }
+            else
+            {
+                schemaName = schema.getName();
+            }
 
-        //    DataSet dataSet;
-        //    if (INFORMATION_SCHEMA_NAME.Equals(schemaName))
-        //    {
-        //        DataSet informationDataSet = materializeInformationSchemaTable(table,
-        //                buildWorkingSelectItems(selectItems, whereItems));
-        //        informationDataSet = MetaModelHelper.getFiltered(informationDataSet, whereItems);
-        //        informationDataSet = MetaModelHelper.getSelection(selectItems, informationDataSet);
-        //        informationDataSet = MetaModelHelper.getPaged(informationDataSet, firstRow, maxRows);
-        //        dataSet = informationDataSet;
-        //    }
-        //    else
-        //    {
-        //        DataSet tableDataSet = materializeMainSchemaTable(table, selectItems, whereItems, firstRow, maxRows);
+            DataSet dataSet;
+            if (INFORMATION_SCHEMA_NAME.Equals(schemaName))
+            {
+                DataSet informationDataSet = materializeInformationSchemaTable
+                                             (table, buildWorkingSelectItems(selectItems, whereItems));
+                informationDataSet = MetaModelHelper.getFiltered(informationDataSet, whereItems);
+                informationDataSet = MetaModelHelper.getSelection(selectItems, informationDataSet);
+                informationDataSet = MetaModelHelper.getPaged(informationDataSet, firstRow, maxRows);
+                dataSet = informationDataSet;
+            }
+            else
+            {
+                DataSet tableDataSet = materializeMainSchemaTable(table, selectItems, whereItems, firstRow, maxRows);
 
-        //        // conversion is done at materialization time, since it enables
-        //        // the refined types to be used also in eg. where clauses.
-        //        dataSet = new ConvertedDataSetInterceptor(_converters).intercept(tableDataSet);
-        //    }
+                // conversion is done at materialization time, since it enables
+                // the refined types to be used also in eg. where clauses.
+                dataSet = new ConvertedDataSetInterceptor(_converters).intercept(tableDataSet);
+            }
 
-        //    return dataSet;
-        //} // materializeTable()
+            return dataSet;
+        } // materializeTable()
 
-        //private List<SelectItem> buildWorkingSelectItems(List<SelectItem> selectItems, List<FilterItem> whereItems)
-        //{
-        //    List<SelectItem> primarySelectItems = new List<SelectItem>(selectItems.Count);
-        //    foreach (SelectItem selectItem in selectItems)
-        //    {
-        //        ScalarFunction scalarFunction = selectItem.getScalarFunction();
-        //        if (scalarFunction == null || isScalarFunctionMaterialized(scalarFunction))
-        //        {
-        //            primarySelectItems.Add(selectItem);
-        //        }
-        //        else
-        //        {
-        //            SelectItem copySelectItem = selectItem.replaceFunction(null);
-        //            primarySelectItems.Add(copySelectItem);
-        //        }
-        //    }
-        //    List<SelectItem> evaluatedSelectItems = MetaModelHelper.getEvaluatedSelectItems(whereItems);
-        //    return CollectionUtils.concat(true, primarySelectItems, evaluatedSelectItems);
-        //} // buildWorkingSelectItems()
+        private List<SelectItem> buildWorkingSelectItems(List<SelectItem> selectItems, List<FilterItem> whereItems)
+        {
+            List<SelectItem> primarySelectItems = new List<SelectItem>(selectItems.Count);
+            foreach (SelectItem selectItem in selectItems)
+            {
+                ScalarFunction scalarFunction = selectItem.getScalarFunction();
+                if (scalarFunction == null || isScalarFunctionMaterialized(scalarFunction))
+                {
+                    primarySelectItems.Add(selectItem);
+                }
+                else
+                {
+                    SelectItem copySelectItem = selectItem.replaceFunction(null);
+                    primarySelectItems.Add(copySelectItem);
+                }
+            }
+            List<SelectItem> evaluatedSelectItems = MetaModelHelper.getEvaluatedSelectItems(whereItems);
+            return CollectionUtils.concat(true, primarySelectItems, evaluatedSelectItems);
+        } // buildWorkingSelectItems()
 
         /**
          * Determines if the subclass of this class can materialize
@@ -515,10 +480,11 @@ namespace org.apache.metamodel
         } // isScalarFunctionMaterialized()
 
         //@Deprecated
-        //protected DataSet materializeTable(Table table, List<SelectItem> selectItems, int firstRow, int maxRows)
-        //{
-        //    return materializeTable(table, selectItems, Collections.< FilterItem > emptyList(), firstRow, maxRows);
-        //}
+        protected DataSet materializeTable(Table table, List<SelectItem> selectItems, int firstRow, int maxRows)
+        {
+            List<FilterItem> empty_list = new List<FilterItem>();
+            return materializeTable(table, selectItems, empty_list, firstRow, maxRows);
+        } // materializeTable()
 
         protected bool isMainSchemaTable(Table table)
         {
@@ -533,7 +499,7 @@ namespace org.apache.metamodel
             }
         } // isMainSchemaTable()
 
-        protected string[] getSchemaNamesInternal() // throws MetaModelException
+        protected override string[] getSchemaNamesInternal() // throws MetaModelException
         {
             String [] schemaNames = new String[2];
             schemaNames[0] = INFORMATION_SCHEMA_NAME;
@@ -541,166 +507,168 @@ namespace org.apache.metamodel
             return schemaNames;
         } // getSchemaNamesInternal()
 
-        public String getDefaultSchemaName() // throws MetaModelException
+        public override String getDefaultSchemaName() // throws MetaModelException
         {
            return getMainSchemaName();
         } // getDefaultSchemaName()
 
-        //protected Schema getSchemaByNameInternal(String name) // throws MetaModelException
-        //{
-        //    string mainSchemaName = getMainSchemaName();
-        //    if (name == null) {
-        //        if (mainSchemaName == null)
-        //        {
-        //            return getMainSchema();
-        //        }
-        //        return null;
-        //    } 
+        protected override Schema getSchemaByNameInternal(String name) // throws MetaModelException
+        {
+            string mainSchemaName = getMainSchemaName();
+            if (name == null || name == "")
+            {
+                if (mainSchemaName == null)
+                {
+                    return getMainSchema();
+                }
+                return null;
+            } 
 
-        //    if (name.Equals(mainSchemaName, StringComparison.CurrentCultureIgnoreCase))
-        //    {
-        //        return getMainSchema();
-        //    }
-        //    else if (name.Equals(INFORMATION_SCHEMA_NAME))
-        //    {
-        //        return getInformationSchema();
-        //    }
+            if (name.Equals(mainSchemaName, StringComparison.CurrentCultureIgnoreCase))
+            {
+                return getMainSchema();
+            }
+            else if (name.Equals(INFORMATION_SCHEMA_NAME))
+            {
+                return getInformationSchema();
+            }
 
-        //    logger.warn("Could not find matching schema of name '{}'. Main schema name is: '{}'. Returning null.",
-        //                name, mainSchemaName);
-        //        return null;
-        //} // getSchemaByNameInternal()
+            logger.warn("Could not find matching schema of name '{}'. Main schema name is: '{}'. Returning null.",
+                        name, mainSchemaName);
+                return null;
+        } // getSchemaByNameInternal()
 
-        //private Schema getInformationSchema()
-        //{
-        //    // Create schema
-        //    MutableSchema informationSchema = new MutableSchema(INFORMATION_SCHEMA_NAME);
-        //    MutableTable tablesTable = new MutableTable("tables", TableType.TABLE, informationSchema);
-        //    MutableTable columnsTable = new MutableTable("columns", TableType.TABLE, informationSchema);
-        //    MutableTable relationshipsTable = new MutableTable("relationships", TableType.TABLE, informationSchema);
-        //    informationSchema.addTable(tablesTable).addTable(columnsTable).addTable(relationshipsTable);
+        private Schema getInformationSchema()
+        {
+            // Create schema
+            MutableSchema informationSchema = new MutableSchema(INFORMATION_SCHEMA_NAME);
+            MutableTable tablesTable        = new MutableTable("tables", TableType.TABLE, informationSchema);
+            MutableTable columnsTable       = new MutableTable("columns", TableType.TABLE, informationSchema);
+            MutableTable relationshipsTable = new MutableTable("relationships", TableType.TABLE, informationSchema);
+            informationSchema.addTable(tablesTable).addTable(columnsTable).addTable(relationshipsTable);
 
-        //    // Create "tables" table: name, type, num_columns, remarks
-        //    tablesTable.addColumn(new MutableColumn("name", ColumnType.VARCHAR, tablesTable, 0, false));
-        //    tablesTable.addColumn(new MutableColumn("type", ColumnType.VARCHAR, tablesTable, 1, true));
-        //    tablesTable.addColumn(new MutableColumn("num_columns", ColumnType.INTEGER, tablesTable, 2, true));
-        //    tablesTable.addColumn(new MutableColumn("remarks", ColumnType.VARCHAR, tablesTable, 3, true));
+            // Create "tables" table: name, type, num_columns, remarks
+            tablesTable.addColumn(new MutableColumn("name", ColumnTypeConstants.VARCHAR, tablesTable, 0, false));
+            tablesTable.addColumn(new MutableColumn("type", ColumnTypeConstants.VARCHAR, tablesTable, 1, true));
+            tablesTable.addColumn(new MutableColumn("num_columns", ColumnTypeConstants.INTEGER, tablesTable, 2, true));
+            tablesTable.addColumn(new MutableColumn("remarks", ColumnTypeConstants.VARCHAR, tablesTable, 3, true));
 
-        //    // Create "columns" table: name, type, native_type, size, nullable,
-        //    // indexed, table, remarks
-        //    columnsTable.addColumn(new MutableColumn("name", ColumnType.VARCHAR, columnsTable, 0, false));
-        //    columnsTable.addColumn(new MutableColumn("type", ColumnType.VARCHAR, columnsTable, 1, true));
-        //    columnsTable.addColumn(new MutableColumn("native_type", ColumnType.VARCHAR, columnsTable, 2, true));
-        //    columnsTable.addColumn(new MutableColumn("size", ColumnType.INTEGER, columnsTable, 3, true));
-        //    columnsTable.addColumn(new MutableColumn("nullable", ColumnType.BOOLEAN, columnsTable, 4, true));
-        //    columnsTable.addColumn(new MutableColumn("indexed", ColumnType.BOOLEAN, columnsTable, 5, true));
-        //    columnsTable.addColumn(new MutableColumn("table", ColumnType.VARCHAR, columnsTable, 6, false));
-        //    columnsTable.addColumn(new MutableColumn("remarks", ColumnType.VARCHAR, columnsTable, 7, true));
+            // Create "columns" table: name, type, native_type, size, nullable,
+            // indexed, table, remarks
+            columnsTable.addColumn(new MutableColumn("name", ColumnTypeConstants.VARCHAR, columnsTable, 0, false));
+            columnsTable.addColumn(new MutableColumn("type", ColumnTypeConstants.VARCHAR, columnsTable, 1, true));
+            columnsTable.addColumn(new MutableColumn("native_type", ColumnTypeConstants.VARCHAR, columnsTable, 2, true));
+            columnsTable.addColumn(new MutableColumn("size", ColumnTypeConstants.INTEGER, columnsTable, 3, true));
+            columnsTable.addColumn(new MutableColumn("nullable", ColumnTypeConstants.BOOLEAN, columnsTable, 4, true));
+            columnsTable.addColumn(new MutableColumn("indexed", ColumnTypeConstants.BOOLEAN, columnsTable, 5, true));
+            columnsTable.addColumn(new MutableColumn("table", ColumnTypeConstants.VARCHAR, columnsTable, 6, false));
+            columnsTable.addColumn(new MutableColumn("remarks", ColumnTypeConstants.VARCHAR, columnsTable, 7, true));
 
-        //    // Create "relationships" table: primary_table, primary_column,
-        //    // foreign_table, foreign_column
-        //    relationshipsTable
-        //            .addColumn(new MutableColumn("primary_table", ColumnType.VARCHAR, relationshipsTable, 0, false));
-        //    relationshipsTable
-        //            .addColumn(new MutableColumn("primary_column", ColumnType.VARCHAR, relationshipsTable, 1, false));
-        //    relationshipsTable
-        //            .addColumn(new MutableColumn("foreign_table", ColumnType.VARCHAR, relationshipsTable, 2, false));
-        //    relationshipsTable
-        //            .addColumn(new MutableColumn("foreign_column", ColumnType.VARCHAR, relationshipsTable, 3, false));
+            // Create "relationships" table: primary_table, primary_column,
+            // foreign_table, foreign_column
+            relationshipsTable
+                    .addColumn(new MutableColumn("primary_table", ColumnTypeConstants.VARCHAR, relationshipsTable, 0, false));
+            relationshipsTable
+                    .addColumn(new MutableColumn("primary_column", ColumnTypeConstants.VARCHAR, relationshipsTable, 1, false));
+            relationshipsTable
+                    .addColumn(new MutableColumn("foreign_table", ColumnTypeConstants.VARCHAR, relationshipsTable, 2, false));
+            relationshipsTable
+                    .addColumn(new MutableColumn("foreign_column", ColumnTypeConstants.VARCHAR, relationshipsTable, 3, false));
 
-        //    MutableRelationship.createRelationship(tablesTable.getColumnByName("name"),
-        //            columnsTable.getColumnByName("table"));
-        //    MutableRelationship.createRelationship(tablesTable.getColumnByName("name"),
-        //            relationshipsTable.getColumnByName("primary_table"));
-        //    MutableRelationship.createRelationship(tablesTable.getColumnByName("name"),
-        //            relationshipsTable.getColumnByName("foreign_table"));
-        //    MutableRelationship.createRelationship(columnsTable.getColumnByName("name"),
-        //            relationshipsTable.getColumnByName("primary_column"));
-        //    MutableRelationship.createRelationship(columnsTable.getColumnByName("name"),
-        //            relationshipsTable.getColumnByName("foreign_column"));
+            MutableRelationship.createRelationship(tablesTable.getColumnByName("name"),
+                    columnsTable.getColumnByName("table"));
+            MutableRelationship.createRelationship(tablesTable.getColumnByName("name"),
+                    relationshipsTable.getColumnByName("primary_table"));
+            MutableRelationship.createRelationship(tablesTable.getColumnByName("name"),
+                    relationshipsTable.getColumnByName("foreign_table"));
+            MutableRelationship.createRelationship(columnsTable.getColumnByName("name"),
+                    relationshipsTable.getColumnByName("primary_column"));
+            MutableRelationship.createRelationship(columnsTable.getColumnByName("name"),
+                    relationshipsTable.getColumnByName("foreign_column"));
 
-        //    return informationSchema;
-        //} // getInformationSchema()
+            return informationSchema;
+        } // getInformationSchema()
 
-        //private DataSet materializeInformationSchemaTable(Table table, List<SelectItem> selectItems)
-        //{
-        //    String tableName = table.getName();
-        //    SelectItem[] columnSelectItems = MetaModelHelper.createSelectItems(table.getColumns());
-        //    SimpleDataSetHeader header = new SimpleDataSetHeader(columnSelectItems);
-        //    Table[] tables = getDefaultSchema().getTables();
-        //    List<Row> data = new List<Row>();
-        //    if ("tables".Equals(tableName))
-        //    {
-        //        // "tables" columns: name, type, num_columns, remarks
-        //        foreach (Table t in tables)
-        //        {
-        //            String typeString = null;
-        //            if (t.GetType() != null)
-        //            {
-        //                typeString = t.getType().ToString();
-        //            }
-        //            data.Add(new DefaultRow(header,
-        //                     new Object[] { t.getName(), typeString, t.getColumnCount(), t.getRemarks() }));
-        //        }
-        //    }
-        //    else if ("columns".Equals(tableName))
-        //    {
-        //        // "columns" columns: name, type, native_type, size, nullable,
-        //        // indexed, table, remarks
-        //        foreach (Table t in tables)
-        //        {
-        //            foreach (Column c in t.getColumns())
-        //            {
-        //                String typeString = null;
-        //                if (t.GetType() != null)
-        //                {
-        //                    typeString = c.getType().ToString();
-        //                }
-        //                data.add(new DefaultRow(header, new Object[] { c.getName(), typeString, c.getNativeType(),
-        //                            c.getColumnSize(), c.isNullable(), c.isIndexed(), t.getName(), c.getRemarks() }));
-        //            }
-        //        }
-        //    }
-        //    else if ("relationships".Equals(tableName))
-        //    {
-        //        // "relationships" columns: primary_table, primary_column,
-        //        // foreign_table, foreign_column
-        //        foreach (Relationship r in getDefaultSchema().getRelationships())
-        //        {
-        //            Column[] primaryColumns = r.getPrimaryColumns();
-        //            Column[] foreignColumns = r.getForeignColumns();
-        //            Table pTable = r.getPrimaryTable();
-        //            Table fTable = r.getForeignTable();
-        //            for (int i = 0; i < primaryColumns.Length; i++)
-        //            {
-        //                Column pColumn = primaryColumns[i];
-        //                Column fColumn = foreignColumns[i];
-        //                data.Add(new DefaultRow(header,
-        //                        new Object[] { pTable.getName(), pColumn.getName(), fTable.getName(), fColumn.getName() }));
-        //            }
-        //        }
-        //    }
-        //    else
-        //    {
-        //        throw new ArgumentException("Cannot materialize non information_schema table: " + table);
-        //    }
+        public virtual DataSet materializeInformationSchemaTable(Table table, List<SelectItem> selectItems)
+        {
+            String              tableName         = table.getName();
+            SelectItem[]        columnSelectItems = MetaModelHelper.createSelectItems(table.getColumns());
+            SimpleDataSetHeader header            = new SimpleDataSetHeader(columnSelectItems);
 
-        //    DataSet dataSet;
-        //    if (data.isEmpty())
-        //    {
-        //        dataSet = new EmptyDataSet(selectItems);
-        //    }
-        //    else
-        //    {
-        //        dataSet = new InMemoryDataSet(header, data);
-        //    }
+            Table[] tables = getDefaultSchema().getTables(false);
+            List<Row> data = new List<Row>();
+            if ("tables".Equals(tableName))
+            {
+                // "tables" columns: name, type, num_columns, remarks
+                foreach (Table t in tables)
+                {
+                    String typeString = null;
+                    if (t.GetType() != null)
+                    {
+                        typeString = t.getType().ToString();
+                    }
+                    data.Add(new DefaultRow(header,
+                             new Object[] { t.getName(), typeString, t.getColumnCount(), t.getRemarks() }));
+                }
+            }
+            else if ("columns".Equals(tableName))
+            {
+                // "columns" columns: name, type, native_type, size, nullable,
+                // indexed, table, remarks
+                foreach (Table t in tables)
+                {
+                    foreach (Column c in t.getColumns())
+                    {
+                        String typeString = null;
+                        if (t.GetType() != null)
+                        {
+                            typeString = c.getType().ToString();
+                        }
+                        data.Add(new DefaultRow(header, new Object[] { c.getName(), typeString, c.getNativeType(),
+                                 c.getColumnSize(), c.isNullable(), c.isIndexed(), t.getName(), c.getRemarks() }));
+                    }
+                }
+            }
+            else if ("relationships".Equals(tableName))
+            {
+                // "relationships" columns: primary_table, primary_column,
+                // foreign_table, foreign_column
+                foreach (Relationship r in getDefaultSchema().getRelationships())
+                {
+                    Column[] primaryColumns = r.getPrimaryColumns();
+                    Column[] foreignColumns = r.getForeignColumns();
+                    Table pTable = r.getPrimaryTable();
+                    Table fTable = r.getForeignTable();
+                    for (int i = 0; i < primaryColumns.Length; i++)
+                    {
+                        Column pColumn = primaryColumns[i];
+                        Column fColumn = foreignColumns[i];
+                        data.Add(new DefaultRow(header,
+                                new Object[] { pTable.getName(), pColumn.getName(), fTable.getName(), fColumn.getName() }));
+                    }
+                }
+            }
+            else
+            {
+                throw new ArgumentException("Cannot materialize non information_schema table: " + table);
+            }
 
-        //    // Handle column subset
-        //    DataSet selectionDataSet = MetaModelHelper.getSelection(selectItems, dataSet);
-        //    dataSet = selectionDataSet;
+            DataSet dataSet;
+            if (data.IsEmpty())
+            {
+                dataSet = new EmptyDataSet(selectItems);
+            }
+            else
+            {
+                dataSet = new InMemoryDataSet(header, data);
+            }
 
-        //    return dataSet;
-        //} // materializeInformationSchemaTable()
+            // Handle column subset
+            DataSet selectionDataSet = MetaModelHelper.getSelection(selectItems, dataSet);
+            dataSet = selectionDataSet;
+
+            return dataSet;
+        } // materializeInformationSchemaTable()
 
         /**
          * 
@@ -709,10 +677,10 @@ namespace org.apache.metamodel
          * @deprecated use {@link #getDefaultSchema()} instead
          */
         //@Deprecated
-        //protected Schema getMainSchemaInternal()
-        //{
-        //    return getDefaultSchema();
-        //}
+        protected Schema getMainSchemaInternal()
+        {
+            return getDefaultSchema();
+        }
 
         /**
          * Adds a {@link TypeConverter} to this DataContext's query engine (Query
@@ -721,20 +689,20 @@ namespace org.apache.metamodel
          * {@link Converters#addTypeConverter(DataContext, Column, TypeConverter)}
          * to ensure conversion on both reads and writes.
          */
-        //public void addConverter(Column column, TypeConverter<object, object> converter)
-        //{
-        //    _converters.Add(column, converter);
-        //}
+        public void addConverter(Column column, TypeConverter<object, object> converter)
+        {
+            _converters.Add(column, converter);
+        }
 
         /**
          * @return the main schema that subclasses of this class produce
          */
-        protected abstract Schema getMainSchema(); // throws MetaModelException;
+        public abstract Schema getMainSchema(); // throws MetaModelException;
 
         /**
          * @return the name of the main schema that subclasses of this class produce
          */
-        protected abstract String getMainSchemaName(); // throws MetaModelException;
+        public abstract String getMainSchemaName(); // throws MetaModelException;
 
         /**
          * Execute a simple one-table query against a table in the main schema of
@@ -749,27 +717,27 @@ namespace org.apache.metamodel
          * @param maxRows
          * @return
          */
-        //protected DataSet materializeMainSchemaTable(Table table, List<SelectItem> selectItems, List<FilterItem> whereItems,
-        //                                             int firstRow, int maxRows)
-        //{
-        //    List<SelectItem> workingSelectItems = buildWorkingSelectItems(selectItems, whereItems);
-        //    DataSet dataSet;
-        //    if (whereItems.isEmpty())
-        //    {
-        //        // paging is pushed down to materializeMainSchemaTable
-        //        dataSet = materializeMainSchemaTable(table, workingSelectItems, firstRow, maxRows);
-        //        dataSet = MetaModelHelper.getSelection(selectItems, dataSet);
-        //    }
-        //    else
-        //    {
-        //        // do not push down paging, first we have to apply filtering
-        //        dataSet = materializeMainSchemaTable(table, workingSelectItems, 1, -1);
-        //        dataSet = MetaModelHelper.getFiltered(dataSet, whereItems);
-        //        dataSet = MetaModelHelper.getPaged(dataSet, firstRow, maxRows);
-        //        dataSet = MetaModelHelper.getSelection(selectItems, dataSet);
-        //    }
-        //    return dataSet;
-        //} // materializeMainSchemaTable()
+        public virtual DataSet materializeMainSchemaTable(Table table, List<SelectItem> selectItems, List<FilterItem> whereItems,
+                                                          int firstRow, int maxRows)
+        {
+            List<SelectItem> workingSelectItems = buildWorkingSelectItems(selectItems, whereItems);
+            DataSet dataSet;
+            if (whereItems.IsEmpty())
+            {
+                // paging is pushed down to materializeMainSchemaTable
+                dataSet = materializeMainSchemaTable(table, workingSelectItems, firstRow, maxRows);
+                dataSet = MetaModelHelper.getSelection(selectItems, dataSet);
+            }
+            else
+            {
+                // do not push down paging, first we have to apply filtering
+                dataSet = materializeMainSchemaTable(table, workingSelectItems, 1, -1);
+                dataSet = MetaModelHelper.getFiltered(dataSet, whereItems);
+                dataSet = MetaModelHelper.getPaged(dataSet, firstRow, maxRows);
+                dataSet = MetaModelHelper.getSelection(selectItems, dataSet);
+            }
+            return dataSet;
+        } // materializeMainSchemaTable()
 
         /**
          * Executes a simple one-table query against a table in the main schema of
@@ -782,19 +750,19 @@ namespace org.apache.metamodel
          * @param maxRows
          * @return
          */
-        //protected DataSet materializeMainSchemaTable(Table table, List<SelectItem> selectItems, int firstRow, int maxRows)
-        //{
-        //    Column[] columns = new Column[selectItems.Count];
-        //    for (int i = 0; i < columns.Length; i++)
-        //    {
-        //        columns[i] = selectItems[i].getColumn();
-        //    }
-        //    DataSet dataSet = materializeMainSchemaTable(table, columns, firstRow, maxRows);
+        public virtual DataSet materializeMainSchemaTable(Table table, List<SelectItem> selectItems, int firstRow, int maxRows)
+        {
+            Column[] columns = new Column[selectItems.Count];
+            for (int i = 0; i < columns.Length; i++)
+            {
+                columns[i] = selectItems[i].getColumn();
+            }
+            DataSet dataSet = materializeMainSchemaTable(table, columns, firstRow, maxRows);
 
-        //    dataSet = MetaModelHelper.getSelection(selectItems, dataSet);
+            dataSet = MetaModelHelper.getSelection(selectItems, dataSet);
 
-        //    return dataSet;
-        //} // materializeMainSchemaTable()
+            return dataSet;
+        } // materializeMainSchemaTable()
 
         /**
          * Executes a simple one-table query against a table in the main schema of
@@ -808,24 +776,24 @@ namespace org.apache.metamodel
          * @param maxRows
          * @return
          */
-        //protected DataSet materializeMainSchemaTable(Table table, Column[] columns, int firstRow, int maxRows)
-        //{
-        //    int rowsToMaterialize;
-        //    if (firstRow == 1)
-        //    {
-        //        rowsToMaterialize = maxRows;
-        //    }
-        //    else
-        //    {
-        //        rowsToMaterialize = maxRows + (firstRow - 1);
-        //    }
-        //    DataSet dataSet = materializeMainSchemaTable(table, columns, rowsToMaterialize);
-        //    if (firstRow > 1)
-        //    {
-        //        dataSet = new FirstRowDataSet(dataSet, firstRow);
-        //    }
-        //    return dataSet;
-        //} // materializeMainSchemaTable()
+        public virtual DataSet materializeMainSchemaTable(Table table, Column[] columns, int firstRow, int maxRows)
+        {
+            int rowsToMaterialize;
+            if (firstRow == 1)
+            {
+                rowsToMaterialize = maxRows;
+            }
+            else
+            {
+                rowsToMaterialize = maxRows + (firstRow - 1);
+            }
+            DataSet dataSet = materializeMainSchemaTable(table, columns, rowsToMaterialize);
+            if (firstRow > 1)
+            {
+                dataSet = new FirstRowDataSet(dataSet, firstRow);
+            }
+            return dataSet;
+        } // materializeMainSchemaTable()
 
         /**
          * Executes a simple one-table query against a table in the main schema of
@@ -840,6 +808,6 @@ namespace org.apache.metamodel
          *            wanted.
          * @return a dataset with the raw table/column content.
          */
-        protected abstract DataSet materializeMainSchemaTable(Table table, Column[] columns, int maxRows);
+        public abstract DataSet materializeMainSchemaTable(Table table, Column[] columns, int maxRows);
     } // QueryPostprocessDataContext class
 } // org.apache.metamodel namespace

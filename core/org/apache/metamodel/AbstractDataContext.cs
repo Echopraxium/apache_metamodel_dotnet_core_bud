@@ -23,6 +23,16 @@ using org.apache.metamodel.schema;
 using System;
 using org.apache.metamodel.core.data;
 using org.apache.metamodel.query;
+using org.apache.metamodel.core.query.parser;
+using System.Collections.Generic;
+using System.Collections.Concurrent;
+using System.Text;
+using org.apache.metamodel.j2n.exceptions;
+using System.Diagnostics;
+using org.apache.metamodel.core.query;
+using org.apache.metamodel.core;
+using org.apache.metamodel.j2n.collections;
+using org.apache.metamodel.core.schema.builder;
 /**
 * Licensed to the Apache Software Foundation (ASF) under one
 * or more contributor license agreements.  See the NOTICE file
@@ -50,19 +60,20 @@ namespace org.apache.metamodel
     public abstract class AbstractDataContext : DataContext
     {
         private static readonly string NULL_SCHEMA_NAME_TOKEN = "<metamodel.schema.name.null>";
-        //private readonly ConcurrentMap<string, Schema> _schemaCache = new ConcurrentHashMap<String, Schema>();
-        //private readonly Comparator<? super String> _schemaNameComparator = SchemaNameComparator.getInstance();
-        private string[] _schemaNameCache;
+
+        private readonly ConcurrentDictionary<string, Schema> _schemaCache          = new ConcurrentDictionary<String, Schema>();
+        private readonly IComparer<string>                    _schemaNameComparator = SchemaNameComparator.getInstance();
+        private string[]                                      _schemaNameCache;
 
         /**
          * {@inheritDoc}
          */
         public DataContext refreshSchemas()
         {
-        //    _schemaCache.clear();
-        //    _schemaNameCache = null;
-        //    onSchemaCacheRefreshed();
-              return this;
+            _schemaCache.Clear();
+            _schemaNameCache = null;
+            onSchemaCacheRefreshed();
+            return this;
         } // refreshSchemas()
 
         /**
@@ -72,101 +83,137 @@ namespace org.apache.metamodel
          */
         protected void onSchemaCacheRefreshed()
         {
-        }
+        } // onSchemaCacheRefreshed()
+
+        protected string[] getNonEmptySchemaNames(string[] schema_names)
+        {
+            List<string> items = new List<string>();
+            for (int i = 0; i < schema_names.Length; i++)
+            {
+                string schema_name = schema_names[i];
+                if (schema_name != "")
+                    items.Add(schema_name);
+            }
+            return items.ToArray();
+        } // onSchemaCacheRefreshed()
 
         /**
          * {@inheritDoc}
          */
-    //    public Schema[] getSchemas()//  throws MetaModelException
-    //    {
-    //        string [] schemaNames = getSchemaNames();
-    //        Schema [] schemas     = new Schema[schemaNames.Length];
-    //        for (int i = 0; i<schemaNames.length; i++)
-    //        {
-    //            string name   = schemaNames[i];
-    //            Schema schema = _schemaCache.get(getSchemaCacheKey(name));
-    //            if (schema == null)
-    //            {
-    //                Schema newSchema = getSchemaByName(name);
-    //                if (newSchema == null)
-    //                {
-    //                    throw new MetaModelException("Declared schema does not exist: " + name);
-    //                }
+        public Schema[] getSchemas() //  throws MetaModelException
+        {
+            //string [] schema_names = getSchemaNames();
+            string[] schema_names = getNonEmptySchemaNames(getSchemaNames());
 
-    //                Schema existingSchema = _schemaCache.putIfAbsent(getSchemaCacheKey(name), newSchema);
-    //                if (existingSchema == null) {
-    //                    schemas[i] = newSchema;
-    //                } else {
-    //                    schemas[i] = existingSchema;
-    //                }
-    //            } else {
-    //                schemas[i] = schema;
-    //            }
-    //        }
-    //        return schemas;
-    //    }
+            Schema [] schemas = new Schema[schema_names.Length];
+            //Schema[] schemas = new Schema[non_empty_schema_names.Length];
+            for (int i = 0; i < schema_names.Length; i++)
+            {
+                string schema_name = schema_names[i];
+                Debug.WriteLine("schema_name: '" + schema_name + "'");
 
-    //    private String getSchemaCacheKey(String name)
-    //{
-    //    if (name == null)
-    //    {
-    //        return NULL_SCHEMA_NAME_TOKEN;
-    //    }
-    //    return name;
-    //}
+                Schema schema = null;
+                if (_schemaCache.ContainsKey(schema_name))
+                {
+                    string schema_cache_key = getSchemaCacheKey(schema_name);
+                    schema = _schemaCache[schema_cache_key];
+                }
 
-    ///**
-    // * m {@inheritDoc}
-    // */
-    //@Override
-    //    public final String[] getSchemaNames() throws MetaModelException
-    //{
-    //        if (_schemaNameCache == null) {
-    //        _schemaNameCache = getSchemaNamesInternal();
-    //    }
-    //    String []
-    //    schemaNames = Arrays.copyOf(_schemaNameCache, _schemaNameCache.length);
-    //    Arrays.sort(schemaNames, _schemaNameComparator);
-    //        return schemaNames;
-    //}
+                if (schema == null)
+                {
+                    Schema newSchema = getSchemaByName(schema_name);
+                    if (newSchema == null)
+                    {
+                        throw new MetaModelException(  "AbstractDataContext.getSchemas()\n"
+                                                     + "    Declared schema does not exist: '" + schema_name + "'");
+                    }
 
-    ///**
-    // * {@inheritDoc}
-    // */
-    //@Override
-       public Schema getDefaultSchema() // throws MetaModelException
-       {
-          Schema result = null;
-            //    final String defaultSchemaName = getDefaultSchemaName();
-            //        if (defaultSchemaName != null) {
-            //        result = getSchemaByName(defaultSchemaName);
-            //    }
-            //        if (result == null) {
-            //        final Schema[] schemas = getSchemas();
-            //        if (schemas.length == 1)
-            //        {
-            //            result = schemas[0];
-            //        }
-            //        else
-            //        {
-            //            int highestTableCount = -1;
-            //            for (int i = 0; i < schemas.length; i++)
-            //            {
-            //                final Schema schema = schemas[i];
-            //                String name = schema.getName();
-            //                if (schema != null)
-            //                {
-            //                    name = name.toLowerCase();
-            //                    final boolean isInformationSchema = name.startsWith("information") && name.endsWith("schema");
-            //                    if (!isInformationSchema && schema.getTableCount() > highestTableCount)
-            //                    {
-            //                        highestTableCount = schema.getTableCount();
-            //                        result = schema;
-            //                    }
-            //                }
-            //            }
-            //        }
-            //    }
+                    Schema existingSchema   = null;
+                    string schema_cache_key = getSchemaCacheKey(schema_name);
+                    if (_schemaCache.ContainsKey(schema_cache_key))
+                       existingSchema = _schemaCache[schema_cache_key] = newSchema;
+
+                    if (existingSchema == null)
+                    {
+                        schemas[i] = newSchema;
+                    } else
+                    {
+                        schemas[i] = existingSchema;
+                    }
+                } else
+                {
+                    schemas[i] = schema;
+                }
+            }
+            return schemas;
+        } // getSchemas()
+
+        private String getSchemaCacheKey(String name)
+        {
+          if (name == null || name =="" )
+          {
+              return NULL_SCHEMA_NAME_TOKEN;
+          }
+          return name;
+        } // getSchemaCacheKey()
+
+        ///**
+        // * m {@inheritDoc}
+        // */
+        //@Override
+        public String[] getSchemaNames() // throws MetaModelException
+        {
+            if (_schemaNameCache == null)
+            {
+                _schemaNameCache = getSchemaNamesInternal();
+            }
+            String [] schemaNames = NArrays.CopyOf(_schemaNameCache, _schemaNameCache.Length);
+            Array.Sort(schemaNames, _schemaNameComparator);
+            return schemaNames;
+        }
+
+        ///**
+        // * {@inheritDoc}
+        // */
+        //@Override
+        public Schema getDefaultSchema() // throws MetaModelException
+        {
+            Schema result            = null;
+            String defaultSchemaName = getDefaultSchemaName();
+            // if (defaultSchemaName != null)
+            if (defaultSchemaName != null && defaultSchemaName != "")
+            {
+                result = getSchemaByName(defaultSchemaName);
+            }
+
+            if (result == null)
+            {
+                Schema[] schemas = getSchemas();
+                if (schemas.Length == 1)
+                {
+                    result = schemas[0];
+                }
+                else
+                {
+                    int highestTableCount = -1;
+                    for (int i = 0; i < schemas.Length; i++)
+                    {
+                        Schema schema = schemas[i];                       
+                        if (schema != null)
+                        {
+                            String name = schema.getName();
+                            name = name.ToLower();
+                            bool isInformationSchema = name.StartsWith("information") && name.EndsWith("schema");
+                            int  table_count         = schema.getTableCount();
+                            if ( (! isInformationSchema) && (table_count > highestTableCount))
+                            {
+                                highestTableCount = schema.getTableCount();
+                                result = schema;
+                            }
+                        }
+                    }
+                }
+            }
             return result;
        } // getDefaultSchema()
 
@@ -175,224 +222,196 @@ namespace org.apache.metamodel
         // */
         //@Override
         public InitFromBuilder query()
-       {
-          //    return new InitFromBuilderImpl(this);
-          throw new NotImplementedException();
+        {
+           return new InitFromBuilderImpl(this);
         } // query()
-
-        public Schema[] getSchemas()
-        {
-            throw new NotImplementedException();
-        }
-
-        public string[] getSchemaNames()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Schema getSchemaByName(string name)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Query parseQuery(string queryString)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual DataSet executeQuery(Query query)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual DataSet executeQuery(string queryString)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Column getColumnByQualifiedLabel(string columnName)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Table getTableByQualifiedLabel(string tableName)
-        {
-            throw new NotImplementedException();
-        }
 
         ///**
         // * {@inheritDoc}
         // */
         //@Override
-        //    public Query parseQuery(final String queryString) throws MetaModelException
-        //{
-        //    final QueryParser parser = new QueryParser(this, queryString);
-        //    final Query query = parser.parse();
-        //    return query;
-        //}
+        public Query parseQuery(String queryString) // throws MetaModelException
+        {
+             QueryParser parser = new QueryParser(this, queryString);
+             Query       query  = parser.parse();
+             return query;
+        } // parseQuery()
 
-        //public CompiledQuery compileQuery(final Query query) throws MetaModelException
-        //{
-        //    return new DefaultCompiledQuery(query);
-        //}
+        public CompiledQuery compileQuery(Query query) //throws MetaModelException
+        {
+            return new DefaultCompiledQuery(query);
+        } // compileQuery()
 
-        //    public DataSet executeQuery(CompiledQuery compiledQuery, Object...values)
-        //{
-        //    assert compiledQuery instanceof DefaultCompiledQuery;
+        public DataSet executeQuery(Query query) // throws MetaModelException;
+        {
+            throw new NotImplementedException("AbstractDataContext.executeQuery(Query)");
+        }
 
-        //    final DefaultCompiledQuery defaultCompiledQuery = (DefaultCompiledQuery)compiledQuery;
-        //    final Query query = defaultCompiledQuery.cloneWithParameterValues(values);
+        public DataSet executeQuery(CompiledQuery compiledQuery, params Object[] values)
+        {
+            Debug.Assert(compiledQuery is DefaultCompiledQuery);
 
-        //    return executeQuery(query);
-        //}
+            DefaultCompiledQuery defaultCompiledQuery = (DefaultCompiledQuery)compiledQuery;
+            Query query = defaultCompiledQuery.cloneWithParameterValues(values);
 
-        ///**
-        // * {@inheritDoc}
-        // */
-        //    public final DataSet executeQuery(final String queryString) throws MetaModelException
-        //{
-        //    final Query query = parseQuery(queryString);
-        //    final DataSet dataSet = executeQuery(query);
-        //        return dataSet;
-        //}
+            return executeQuery((CompiledQuery) query);
+        } // executeQuery()
 
         ///**
         // * {@inheritDoc}
         // */
-        //    public final Schema getSchemaByName(String name) throws MetaModelException
-        //{
-        //    Schema schema = _schemaCache.get(getSchemaCacheKey(name));
-        //    if (schema == null)
-        //    {
-        //        if (name == null)
-        //        {
-        //            schema = getSchemaByNameInternal(null);
-        //        }
-        //        else
-        //        {
-        //            String[] schemaNames = getSchemaNames();
-        //            for (String schemaName : schemaNames)
-        //            {
-        //                if (name.equalsIgnoreCase(schemaName))
-        //                {
-        //                    schema = getSchemaByNameInternal(name);
-        //                    break;
-        //                }
-        //            }
-        //            if (schema == null)
-        //            {
-        //                for (String schemaName : schemaNames)
-        //                {
-        //                    if (name.equalsIgnoreCase(schemaName))
-        //                    {
-        //                        // try again with "schemaName" as param instead of
-        //                        // "name".
-        //                        schema = getSchemaByNameInternal(schemaName);
-        //                        break;
-        //                    }
-        //                }
-        //            }
-        //        }
-        //        if (schema != null)
-        //        {
-        //            Schema existingSchema = _schemaCache.putIfAbsent(getSchemaCacheKey(schema.getName()), schema);
-        //            if (existingSchema != null)
-        //            {
-        //                // race conditions may cause two schemas to be created.
-        //                // We'll favor the existing schema if possible, since schema
-        //                // may contain lazy-loading logic and so on.
-        //                return existingSchema;
-        //            }
-        //        }
-        //    }
-        //    return schema;
-        //    }
+        public DataSet executeQuery(String queryString) // throws MetaModelException
+        {
+            Query   query   = parseQuery(queryString);
+            DataSet dataSet = executeQuery(query.ToString());
+            return dataSet;
+        } // executeQuery()
+
+        /**
+         * {@inheritDoc}
+         */
+        public virtual Schema getSchemaByName(String name)  // throws MetaModelException
+        {
+            Schema schema = null;
+            string schema_cache_key = getSchemaCacheKey(name);
+            if (_schemaCache.ContainsKey(schema_cache_key))
+                 schema = _schemaCache[schema_cache_key];
+
+            if (schema == null)
+            {
+                if (name == null)
+                {
+                    schema = getSchemaByNameInternal(null);
+                }
+                else
+                {
+                    String[] schemaNames = getSchemaNames();
+                    foreach (String schemaName in schemaNames)
+                    {
+                        if (name.Equals(schemaName, StringComparison.CurrentCultureIgnoreCase))
+                        {
+                            schema = getSchemaByNameInternal(name);
+                            break;
+                        }
+                    }
+                    if (schema == null)
+                    {
+                        foreach (String schemaName in schemaNames)
+                        {
+                            if (name.Equals(schemaName, StringComparison.CurrentCultureIgnoreCase))
+                            {
+                                // try again with "schemaName" as param instead of
+                                // "name".
+                                schema = getSchemaByNameInternal(schemaName);
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (schema != null)
+                {
+                    Schema existingSchema = null;
+                    if (_schemaCache.ContainsKey(getSchemaCacheKey(schema.getName())))
+                        existingSchema = _schemaCache[getSchemaCacheKey(schema.getName())] = schema;
+                    if (existingSchema != null)
+                    {
+                        // race conditions may cause two schemas to be created.
+                        // We'll favor the existing schema if possible, since schema
+                        // may contain lazy-loading logic and so on.
+                        return existingSchema;
+                    }
+                }
+            }
+            return schema;
+        } // getSchemaByName()
 
         //    /**
         //     * {@inheritDoc}
         //     */
         //    @Override
-        //    public final Column getColumnByQualifiedLabel(final String columnName)
-        //{
-        //    if (columnName == null)
-        //    {
-        //        return null;
-        //    }
+        public Column getColumnByQualifiedLabel(String columnName)
+        {
+            Schema schema = null;
 
-        //    final String[] tokens = tokenizePath(columnName, 3);
-        //    if (tokens != null)
-        //    {
-        //        final Schema schema = getSchemaByToken(tokens[0]);
-        //        if (schema != null)
-        //        {
-        //            final Table table = schema.getTableByName(tokens[1]);
-        //            if (table != null)
-        //            {
-        //                final Column column = table.getColumnByName(tokens[2]);
-        //                if (column != null)
-        //                {
-        //                    return column;
-        //                }
-        //            }
-        //        }
-        //    }
+            if (columnName == null)
+            {
+                return null;
+            }
 
-        //    Schema schema = null;
-        //    final String[] schemaNames = getSchemaNames();
-        //    for (final String schemaName : schemaNames)
-        //    {
-        //        if (schemaName == null)
-        //        {
-        //            // search without schema name (some databases have only a single
-        //            // schema with no name)
-        //            schema = getSchemaByName(null);
-        //            if (schema != null)
-        //            {
-        //                Column column = getColumn(schema, columnName);
-        //                if (column != null)
-        //                {
-        //                    return column;
-        //                }
-        //            }
-        //        }
-        //        else
-        //        {
-        //            // Search case-sensitive
-        //            Column col = searchColumn(schemaName, columnName, columnName);
-        //            if (col != null)
-        //            {
-        //                return col;
-        //            }
-        //        }
-        //    }
+            String[] tokens = tokenizePath(columnName, 3);
+            if (tokens != null)
+            {
+                schema = getSchemaByToken(tokens[0]);
+                if (schema != null)
+                {
+                    Table table = schema.getTableByName(tokens[1]);
+                    if (table != null)
+                    {
+                        Column column = table.getColumnByName(tokens[2]);
+                        if (column != null)
+                        {
+                            return column;
+                        }
+                    }
+                }
+            }
 
-        //    final String columnNameInLowerCase = columnName.toLowerCase();
-        //    for (final String schemaName : schemaNames)
-        //    {
-        //        if (schemaName != null)
-        //        {
-        //            // search case-insensitive
-        //            String schameNameInLowerCase = schemaName.toLowerCase();
-        //            Column col = searchColumn(schameNameInLowerCase, columnName, columnNameInLowerCase);
-        //            if (col != null)
-        //            {
-        //                return col;
-        //            }
-        //        }
-        //    }
+            schema = null;
+            String[] schemaNames = getSchemaNames();
+            foreach (String schemaName in schemaNames)
+            {
+                if (schemaName == null)
+                {
+                    // search without schema name (some databases have only a single
+                    // schema with no name)
+                    schema = getSchemaByName(null);
+                    if (schema != null)
+                    {
+                        Column column = getColumn(schema, columnName);
+                        if (column != null)
+                        {
+                            return column;
+                        }
+                    }
+                }
+                else
+                {
+                    // Search case-sensitive
+                    Column col = searchColumn(schemaName, columnName, columnName);
+                    if (col != null)
+                    {
+                        return col;
+                    }
+                }
+            }
 
-        //    schema = getDefaultSchema();
-        //    if (schema != null)
-        //    {
-        //        Column column = getColumn(schema, columnName);
-        //        if (column != null)
-        //        {
-        //            return column;
-        //        }
-        //    }
+            String columnNameInLowerCase = columnName.ToLower();
+            foreach (String schemaName in schemaNames)
+            {
+                if (schemaName != null)
+                {
+                    // search case-insensitive
+                    String schameNameInLowerCase = schemaName.ToLower();
+                    Column col = searchColumn(schameNameInLowerCase, columnName, columnNameInLowerCase);
+                    if (col != null)
+                    {
+                       return col;
+                    }
+                }
+            }
 
-        //    return null;
-        //}
+            schema = getDefaultSchema();
+            if (schema != null)
+            {
+                Column column = getColumn(schema, columnName);
+                if (column != null)
+                {
+                    return column;
+                }
+            }
+
+            return null;
+        } // getColumnByQualifiedLabel()
 
         ///**
         // * Searches for a particular column within a schema
@@ -406,179 +425,180 @@ namespace org.apache.metamodel
         // *            as original, or lower case in case of case-insensitive search)
         // * @return
         // */
-        //private Column searchColumn(String schemaNameSearch, String columnNameOriginal, String columnNameSearch)
-        //{
-        //    if (columnNameSearch.startsWith(schemaNameSearch))
-        //    {
-        //        Schema schema = getSchemaByName(schemaNameSearch);
-        //        if (schema != null)
-        //        {
-        //            String tableAndColumnPath = columnNameOriginal.substring(schemaNameSearch.length());
+        private Column searchColumn(String schemaNameSearch, String columnNameOriginal, String columnNameSearch)
+        {
+            if (columnNameSearch.StartsWith(schemaNameSearch))
+            {
+                Schema schema = getSchemaByName(schemaNameSearch);
+                if (schema != null)
+                {
+                    String tableAndColumnPath = columnNameOriginal.Substring(schemaNameSearch.Length);
 
-        //            if (tableAndColumnPath.charAt(0) == '.')
-        //            {
-        //                tableAndColumnPath = tableAndColumnPath.substring(1);
+                    if (tableAndColumnPath[0] == '.')
+                    {
+                        tableAndColumnPath = tableAndColumnPath.Substring(1);
 
-        //                Column column = getColumn(schema, tableAndColumnPath);
-        //                if (column != null)
-        //                {
-        //                    return column;
-        //                }
-        //            }
-        //        }
-        //    }
-        //    return null;
-        //}
+                        Column column = getColumn(schema, tableAndColumnPath);
+                        if (column != null)
+                        {
+                            return column;
+                        }
+                    }
+                }
+            }
+            return null;
+        } // searchColumn()
 
-        //private final Column getColumn(final Schema schema, final String tableAndColumnPath)
-        //{
-        //    Table table = null;
-        //    String columnPath = tableAndColumnPath;
-        //    final String[] tableNames = schema.getTableNames();
-        //    for (final String tableName : tableNames)
-        //    {
-        //        if (tableName != null)
-        //        {
-        //            // search case-sensitive
-        //            if (isStartingToken(tableName, tableAndColumnPath))
-        //            {
-        //                table = schema.getTableByName(tableName);
-        //                columnPath = tableAndColumnPath.substring(tableName.length());
+        private Column getColumn(Schema schema, String tableAndColumnPath)
+        {
+            Table    table      = null;
+            String   columnPath = tableAndColumnPath;
+            String[] tableNames = schema.getTableNames(false);
+            foreach (String tableName in tableNames)
+            {
+                if (tableName != null)
+                {
+                    // search case-sensitive
+                    if (isStartingToken(tableName, tableAndColumnPath))
+                    {
+                        table = schema.getTableByName(tableName);
+                        columnPath = tableAndColumnPath.Substring(tableName.Length);
 
-        //                if (columnPath.charAt(0) == '.')
-        //                {
-        //                    columnPath = columnPath.substring(1);
-        //                    break;
-        //                }
-        //            }
-        //        }
-        //    }
+                        if (columnPath[0] == '.')
+                        {
+                            columnPath = columnPath.Substring(1);
+                            break;
+                        }
+                    }
+                }
+            }
 
-        //    if (table == null)
-        //    {
-        //        final String tableAndColumnPathInLowerCase = tableAndColumnPath.toLowerCase();
-        //        for (final String tableName : tableNames)
-        //        {
-        //            if (tableName != null)
-        //            {
-        //                String tableNameInLowerCase = tableName.toLowerCase();
-        //                // search case-insensitive
-        //                if (isStartingToken(tableNameInLowerCase, tableAndColumnPathInLowerCase))
-        //                {
-        //                    table = schema.getTableByName(tableName);
-        //                    columnPath = tableAndColumnPath.substring(tableName.length());
+            if (table == null)
+            {
+                String tableAndColumnPathInLowerCase = tableAndColumnPath.ToLower();
+                foreach (String tableName in tableNames)
+                {
+                    if (tableName != null)
+                    {
+                        String tableNameInLowerCase = tableName.ToLower();
+                        // search case-insensitive
+                        if (isStartingToken(tableNameInLowerCase, tableAndColumnPathInLowerCase))
+                        {
+                            table = schema.getTableByName(tableName);
+                            columnPath = tableAndColumnPath.Substring(tableName.Length);
 
-        //                    if (columnPath.charAt(0) == '.')
-        //                    {
-        //                        columnPath = columnPath.substring(1);
-        //                        break;
-        //                    }
-        //                }
-        //            }
-        //        }
-        //    }
+                            if (columnPath[0] == '.')
+                            {
+                                columnPath = columnPath.Substring(1);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
 
-        //    if (table == null && tableNames.length == 1)
-        //    {
-        //        table = schema.getTables()[0];
-        //    }
+            if (table == null && tableNames.Length == 1)
+            {
+                table = schema.getTables(false)[0];
+            }
 
-        //    if (table != null)
-        //    {
-        //        Column column = table.getColumnByName(columnPath);
-        //        if (column != null)
-        //        {
-        //            return column;
-        //        }
-        //    }
+            if (table != null)
+            {
+                Column column = table.getColumnByName(columnPath);
+                if (column != null)
+                {
+                    return column;
+                }
+            }
 
-        //    return null;
-        //}
+            return null;
+        } // getColumn()
 
         ///**
         // * {@inheritDoc}
         // */
         //@Override
-        //    public final Table getTableByQualifiedLabel(final String tableName)
-        //{
-        //    if (tableName == null)
-        //    {
-        //        return null;
-        //    }
+        public Table getTableByQualifiedLabel(String tableName)
+        {
+            if (tableName == null)
+            {
+                return null;
+            }
 
-        //    final String[] tokens = tokenizePath(tableName, 2);
-        //    if (tokens != null)
-        //    {
-        //        Schema schema = getSchemaByToken(tokens[0]);
-        //        if (schema != null)
-        //        {
-        //            Table table = schema.getTableByName(tokens[1]);
-        //            if (table != null)
-        //            {
-        //                return table;
-        //            }
-        //        }
-        //    }
+            Schema   schema = null;
+            String[] tokens = tokenizePath(tableName, 2);
+            if (tokens != null)
+            {
+                schema = getSchemaByToken(tokens[0]);
+                if (schema != null)
+                {
+                    Table table = schema.getTableByName(tokens[1]);
+                    if (table != null)
+                    {
+                        return table;
+                    }
+                }
+            }
 
-        //    Schema schema = null;
-        //    String[] schemaNames = getSchemaNames();
-        //    for (String schemaName : schemaNames)
-        //    {
-        //        if (schemaName == null)
-        //        {
-        //            // there's an unnamed schema present.
-        //            schema = getSchemaByName(null);
-        //            if (schema != null)
-        //            {
-        //                Table table = schema.getTableByName(tableName);
-        //                return table;
-        //            }
-        //        }
-        //        else
-        //        {
-        //            // case-sensitive search
-        //            if (isStartingToken(schemaName, tableName))
-        //            {
-        //                schema = getSchemaByName(schemaName);
-        //            }
-        //        }
-        //    }
+            schema = null;
+            String[] schemaNames = getSchemaNames();
+            foreach (String schemaName_1 in schemaNames)
+            {
+                if (schemaName_1 == null)
+                {
+                    // there's an unnamed schema present.
+                    schema = getSchemaByName(null);
+                    if (schema != null)
+                    {
+                        Table table = schema.getTableByName(tableName);
+                        return table;
+                    }
+                }
+                else
+                {
+                    // case-sensitive search
+                    if (isStartingToken(schemaName_1, tableName))
+                    {
+                        schema = getSchemaByName(schemaName_1);
+                    }
+                }
+            }
 
-        //    if (schema == null)
-        //    {
-        //        final String tableNameInLowerCase = tableName.toLowerCase();
-        //        for (final String schemaName : schemaNames)
-        //        {
-        //            if (schemaName != null)
-        //            {
-        //                // case-insensitive search
-        //                final String schemaNameInLowerCase = schemaName.toLowerCase();
-        //                if (isStartingToken(schemaNameInLowerCase, tableNameInLowerCase))
-        //                {
-        //                    schema = getSchemaByName(schemaName);
-        //                }
-        //            }
-        //        }
-        //    }
+            if (schema == null)
+            {
+                String tableNameInLowerCase = tableName.ToLower();
+                foreach (String schemaName_2 in schemaNames)
+                {
+                    if (schemaName_2 != null)
+                    {
+                        // case-insensitive search
+                        String schemaNameInLowerCase = schemaName_2.ToLower();
+                        if (isStartingToken(schemaNameInLowerCase, tableNameInLowerCase))
+                        {
+                            schema = getSchemaByName(schemaName_2);
+                        }
+                    }
+                }
+            }
 
-        //    if (schema == null)
-        //    {
-        //        schema = getDefaultSchema();
-        //    }
+            if (schema == null)
+            {
+                schema = getDefaultSchema();
+            }
 
-        //    String tablePart = tableName.toLowerCase();
-        //    String schemaName = schema.getName();
-        //    if (schemaName != null && isStartingToken(schemaName.toLowerCase(), tablePart))
-        //    {
-        //        tablePart = tablePart.substring(schemaName.length());
-        //        if (tablePart.startsWith("."))
-        //        {
-        //            tablePart = tablePart.substring(1);
-        //        }
-        //    }
+            String tablePart  = tableName.ToLower();
+            String schemaName = schema.getName();
+            if (schemaName != null && isStartingToken(schemaName.ToLower(), tablePart))
+            {
+                tablePart = tablePart.Substring(schemaName.Length);
+                if (tablePart.StartsWith("."))
+                {
+                    tablePart = tablePart.Substring(1);
+                }
+            }
 
-        //    return schema.getTableByName(tablePart);
-        //}
+            return schema.getTableByName(tablePart);
+        } // getTableByQualifiedLabel()
 
         ///**
         // * Tokenizes a path for a table or a column.
@@ -587,115 +607,115 @@ namespace org.apache.metamodel
         // * @param expectedParts
         // * @return
         // */
-        //private String[] tokenizePath(String path, int expectedParts)
-        //{
-        //    final List<String> tokens = new ArrayList<String>(expectedParts);
+        private String[] tokenizePath(String path, int expectedParts)
+        {
+            List<String> tokens = new List<String>(expectedParts);
 
-        //    boolean inQuotes = false;
-        //    final StringBuilder currentToken = new StringBuilder();
-        //    for (int i = 0; i < path.length(); i++)
-        //    {
-        //        char c = path.charAt(i);
-        //        if (c == '.' && !inQuotes)
-        //        {
-        //            // token finished
-        //            tokens.add(currentToken.toString());
-        //            currentToken.setLength(0);
+            bool inQuotes = false;
+            StringBuilder currentToken = new StringBuilder();
+            for (int i = 0; i < path.Length; i++)
+            {
+                char c = path[i];
+                if (c == '.' && !inQuotes)
+                {
+                    // token finished
+                    tokens.Add(currentToken.ToString());
+                    currentToken.Length = 0; // setLength(0);
 
-        //            if (tokens.size() > expectedParts)
-        //            {
-        //                // unsuccesfull - return null
-        //                return null;
-        //            }
-        //        }
-        //        else if (c == '"')
-        //        {
-        //            if (inQuotes)
-        //            {
-        //                if (i + 1 < path.length() && path.charAt(i + 1) != '.')
-        //                {
-        //                    // unsuccesfull - return null
-        //                    return null;
-        //                }
-        //            }
-        //            else
-        //            {
-        //                if (currentToken.length() > 0)
-        //                {
-        //                    // unsuccesfull - return null
-        //                    return null;
-        //                }
-        //            }
-        //            inQuotes = !inQuotes;
-        //        }
-        //        else
-        //        {
-        //            currentToken.append(c);
-        //        }
-        //    }
+                    if (tokens.Count > expectedParts)
+                    {
+                        // unsuccesfull - return null
+                        return null;
+                    }
+                }
+                else if (c == '"')
+                {
+                    if (inQuotes)
+                    {
+                        if (i + 1 < path.Length && path[i + 1] != '.')
+                        {
+                            // unsuccesfull - return null
+                            return null;
+                        }
+                    }
+                    else
+                    {
+                        if (currentToken.Length > 0)
+                        {
+                            // unsuccesfull - return null
+                            return null;
+                        }
+                    }
+                    inQuotes = !inQuotes;
+                }
+                else
+                {
+                    currentToken.Append(c);
+                }
+            }
 
-        //    if (currentToken.length() > 0)
-        //    {
-        //        tokens.add(currentToken.toString());
-        //    }
+            if (currentToken.Length > 0)
+            {
+                tokens.Add(currentToken.ToString());
+            }
 
-        //    if (tokens.size() == expectedParts - 1)
-        //    {
-        //        // add a special-meaning "null" which will be interpreted as the
-        //        // default schema (since the schema wasn't specified).
-        //        tokens.add(0, null);
-        //    }
-        //    else if (tokens.size() != expectedParts)
-        //    {
-        //        return null;
-        //    }
+            if (tokens.Count == expectedParts - 1)
+            {
+                // add a special-meaning "null" which will be interpreted as the
+                // default schema (since the schema wasn't specified).
+                tokens.Insert(0, null);
+            }
+            else if (tokens.Count != expectedParts)
+            {
+                return null;
+            }
 
-        //    return tokens.toArray(new String[tokens.size()]);
-        //}
+            return tokens.ToArray(); // (new String[tokens.Count]);
+        } // tokenizePath()
 
-        //private Schema getSchemaByToken(String token)
-        //{
-        //    if (token == null)
-        //    {
-        //        return getDefaultSchema();
-        //    }
-        //    try
-        //    {
-        //        return getSchemaByName(token);
-        //    }
-        //    catch (RuntimeException e)
-        //    {
-        //        // swallow this exception - the attempt did not work and the null
-        //        // will be treated.
-        //        return null;
-        //    }
-        //}
+        private Schema getSchemaByToken(String token)
+        {
+            if (token == null)
+            {
+                return getDefaultSchema();
+            }
+            try
+            {
+                return getSchemaByName(token);
+            }
+            catch (NRuntimeException e)
+            {
+                // swallow this exception - the attempt did not work and the null
+                // will be treated.
+                return null;
+            }
+        } // tokenizePath()
 
-        //private boolean isStartingToken(String partName, String fullName)
-        //{
-        //    if (fullName.startsWith(partName))
-        //    {
-        //        final int length = partName.length();
-        //        if (length == 0)
-        //        {
-        //            return false;
-        //        }
-        //        if (fullName.length() > length)
-        //        {
-        //            final char nextChar = fullName.charAt(length);
-        //            if (isQualifiedPathDelim(nextChar))
-        //            {
-        //                return true;
-        //            }
-        //        }
-        //    }
-        //    return false;
-        //}
+        private bool isStartingToken(String partName, String fullName)
+        {
+            if (fullName.StartsWith(partName))
+            {
+                int length = partName.Length;
+                if (length == 0)
+                {
+                    return false;
+                }
+                if (fullName.Length > length)
+                {
+                    char nextChar = fullName[length];
+                    if (isQualifiedPathDelim(nextChar))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
 
-        //protected boolean isQualifiedPathDelim(char c)
-        //{
-        //    return c == '.' || c == '"';
-        //}
+        protected bool isQualifiedPathDelim(char c)
+        {
+            return c == '.' || c == '"';
+        } // isQualifiedPathDelim()
 
         ///**
         // * Gets schema names from the non-abstract implementation. These schema
@@ -704,14 +724,14 @@ namespace org.apache.metamodel
         // * 
         // * @return an array of schema names.
         // */
-        //protected abstract String[] getSchemaNamesInternal();
+        protected abstract String[] getSchemaNamesInternal();
 
         ///**
         // * Gets the name of the default schema.
         // * 
         // * @return the default schema name.
         // */
-        //protected abstract String getDefaultSchemaName();
+        public abstract String getDefaultSchemaName();
 
         ///**
         // * Gets a specific schema from the non-abstract implementation. This schema
@@ -723,6 +743,6 @@ namespace org.apache.metamodel
         // * @return a schema object representing the named schema, or null if no such
         // *         schema exists.
         // */
-        //protected abstract Schema getSchemaByNameInternal(String name);
+        protected abstract Schema getSchemaByNameInternal(String name);
     } // AbstractDataContext class
 } // org.apache.metamodel.query.builder namespace

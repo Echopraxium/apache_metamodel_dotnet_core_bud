@@ -46,11 +46,15 @@ namespace org.apache.metamodel.j2n.slf4j
          * @param format the format string
          * @param arg    the argument
          */
-        void debug(string format, object arg, object arg2 = null);
+        void debug(string format, params object[] args);
 
-        void warn(string format, object arg, object arg2 = null);
 
-        void error(string format, object arg, object arg2 = null);
+        void warn(string msg);
+        void warn(string format, params object[] args);
+
+
+        void error(string format, params object[] args);
+
 
         void info(string msg, params object[] args);
 

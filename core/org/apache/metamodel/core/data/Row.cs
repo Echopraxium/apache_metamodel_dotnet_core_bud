@@ -52,7 +52,7 @@ namespace org.apache.metamodel.data
          * @param column
          * @return the value of the specified column
          */
-       object getValue(Column column);
+        object getValue(Column column);
 
         /**
          * Gets the value of the row at a given index

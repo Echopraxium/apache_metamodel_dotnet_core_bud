@@ -18,17 +18,10 @@
  */
 // https://github.com/apache/metamodel/blob/master/core/src/main/java/org/apache/metamodel/DataContext.java
 using org.apache.metamodel.core.data;
+using org.apache.metamodel.core.query;
 using org.apache.metamodel.query;
 using org.apache.metamodel.schema;
 using System;
-//import org.apache.metamodel.data.DataSet;
-//import org.apache.metamodel.query.CompiledQuery;
-//import org.apache.metamodel.query.Query;
-//import org.apache.metamodel.query.QueryParameter;
-//import org.apache.metamodel.query.builder.InitFromBuilder;
-//import org.apache.metamodel.schema.Column;
-//import org.apache.metamodel.schema.Schema;
-//import org.apache.metamodel.schema.Table;
 
 namespace org.apache.metamodel
 {
@@ -148,7 +141,7 @@ namespace org.apache.metamodel
          * @throws MetaModelException
          *             if preparing the query is unsuccesful
          */
-        //CompiledQuery compileQuery(Query query); // throws MetaModelException;
+        CompiledQuery compileQuery(Query query); // throws MetaModelException;
 
         /**
          * Executes a compiled query with given values as parameters.
@@ -159,7 +152,7 @@ namespace org.apache.metamodel
          *            the values for parameters in the {@link CompiledQuery}.
          * @return the {@link DataSet} produced from executing the query.
          */
-        //DataSet executeQuery(CompiledQuery compiledQuery, params Object[] values);
+        DataSet executeQuery(CompiledQuery compiledQuery, params Object[] values);
 
         /**
          * Parses and executes a string-based SQL query.

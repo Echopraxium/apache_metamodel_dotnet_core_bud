@@ -47,14 +47,14 @@ namespace org.apache.metamodel.util
         }
 
         //[J2N] Implementation helper class which replaces the anonymous interface implementation class in Java
-        private class _Number_Comparable_Impl_ : IComparable<object>
+        private class _Number_Comparable_Impl_ : IComparer<object>
         {
-            private NNumber _value_;
+            private NNumber           _value_;
             private IComparer<object> _instance_;
 
             public _Number_Comparable_Impl_(IComparer<object> instance_arg, NNumber value_arg)
             {
-                _value_ = value_arg;
+                _value_    = value_arg;
                 _instance_ = instance_arg;
             } // constructor
 
@@ -63,22 +63,23 @@ namespace org.apache.metamodel.util
                 return _instance.Equals(obj);
             }
 
-            public int CompareTo(object o)
-            {
-                return _instance.Compare(_value_, o);
-            }
             public String toString()
             {
                 return "NumberComparable[number=" + _value_ + "]";
             }
+
+            public int Compare(object x, object y)
+            {
+                return _instance.Compare(x, y);
+            }
         } // _Number_Comparable_Impl_
 
 
-        public static IComparable<object> getComparable(object o)
-        {
-            NNumber n = toNumber(o);
-            return new _Number_Comparable_Impl_(_instance, n);
-        } // getComparable()
+        //public static IComparable<object> getComparable(object o)
+        //{
+        //    NNumber n = toNumber(o);
+        //    return new _Number_Comparable_Impl_(_instance, n);
+        //} // getComparable()
 
 
         public int Compare(object o1, object o2)

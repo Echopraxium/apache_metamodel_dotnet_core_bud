@@ -16,7 +16,6 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-
 namespace org.apache.metamodel.j2n
 {
     public interface NCloneable

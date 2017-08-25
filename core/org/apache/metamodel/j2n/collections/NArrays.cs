@@ -16,6 +16,7 @@
 * specific language governing permissions and limitations
 * under the License.
 */
+using System;
 using System.Collections.Generic;
 
 namespace org.apache.metamodel.j2n.collections
@@ -31,5 +32,31 @@ namespace org.apache.metamodel.j2n.collections
         {
             return "[" + string.Join(",", list) + "]";
         } // AsString()
-    } // NArrays class
+
+        public static string ArrayAsString<T>(T[] items)
+        {
+            if (items == null || items.Length <= 0)
+                return "[]";
+
+            T[] sorted_items = new T[items.Length]; 
+            Array.Copy(items, sorted_items, items.Length);
+            Array.Sort(sorted_items);
+            return "[" + string.Join(", ", sorted_items) + "]";
+        } // ArrayAsString()
+
+        // https://www.tutorialspoint.com/java/util/arrays_copyof_int.htm
+        public static string[] CopyOf(string[] source, int length)
+        {
+            string[] output = new string[length];
+            for (int i = 0; i < length; i++)
+            {
+                if (i > source.Length - 1)
+                    output[i] = "";
+                else
+                    output[i] = source[i];
+            }
+            return output;
+        } // CopyOf()
+
+} // NArrays class
 } // org.apache.metamodel.j2n.collections namespace

@@ -33,9 +33,14 @@ namespace org.apache.metamodel.j2n.collections
             return !source.Any();
         } // IsEmpty<T>
 
-        public static List<T> toList<T>(this IEnumerable<T> source)
+        public static List<T> AsList<T>(this IEnumerable<T> source)
         {
-            return source.toList();
+            List<T> items = new List<T>();
+            foreach (T item in source)
+            {
+                items.Add(item);
+            }
+            return items;
         } // toList<T>
 
         // https://stackoverflow.com/questions/20923418/collection-containsall-implementation-in-c-sharp

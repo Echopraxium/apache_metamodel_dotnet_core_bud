@@ -17,6 +17,7 @@
  * under the License.
  */
 // https://github.com/apache/metamodel/blob/master/core/src/main/java/org/apache/metamodel/query/builder/SatisfiedFromBuilder.java
+using org.apache.metamodel.core.query.builder;
 using org.apache.metamodel.schema;
 
 namespace org.apache.metamodel.query.builder
@@ -27,19 +28,19 @@ namespace org.apache.metamodel.query.builder
      */
     public interface SatisfiedFromBuilder
     {
-        TableFromBuilder And(Table table);
-        TableFromBuilder and(string schemaName, string tableName);
-        TableFromBuilder and(string tableName);
-        //ColumnSelectBuilder<object>   select(Column column);
-        //FunctionSelectBuilder<object> select(FunctionType function, string columnName);
-        //FunctionSelectBuilder<object> select(FunctionType function, Column column);
-        FunctionSelectBuilder<object> select(FunctionType function, string columnName, object[] functionParameters);
-        //FunctionSelectBuilder<object> select(FunctionType function, Column column, object[] functionParameters);
-        //CountSelectBuilder<object> selectCount();
-        SatisfiedSelectBuilder<object> select(params Column[] columns);
-        SatisfiedSelectBuilder<object> selectAll();
-        SatisfiedSelectBuilder<object> select(string selectExpression);
-        SatisfiedSelectBuilder<object> select(string selectExpression, bool allowExpressionBasedSelectItem);
-        SatisfiedSelectBuilder<object> select(params string[] columnNames);
+        TableFromBuilder       And(Table table);
+        TableFromBuilder       And(string schemaName, string tableName);
+        TableFromBuilder       And(string tableName);
+        ColumnSelectBuilder    select(Column column);
+        FunctionSelectBuilder  select(FunctionType function, string columnName);
+        FunctionSelectBuilder  select(FunctionType function, Column column);
+        FunctionSelectBuilder  select(FunctionType function, string columnName, object[] functionParameters);
+        FunctionSelectBuilder  select(FunctionType function, Column column, object[] functionParameters);
+        CountSelectBuilder     selectCount();
+        SatisfiedSelectBuilder select(params Column[] columns);
+        SatisfiedSelectBuilder selectAll();
+        SatisfiedSelectBuilder select(string selectExpression);
+        SatisfiedSelectBuilder select(string selectExpression, bool allowExpressionBasedSelectItem);
+        SatisfiedSelectBuilder select(params string[] columnNames);
     } // SatisfiedFromBuilder interface
 }

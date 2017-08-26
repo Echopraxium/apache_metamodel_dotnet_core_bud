@@ -2,47 +2,41 @@
                                         README
                                          
 Project:                  Porting Apache MetaModel from Java to C# .Net Core 1.1
+                          https://github.com/Echopraxium/apache_metamodel_dotnet_core_bud
 Author:                   Michel Kern (echopraxium)
 License of this document: Apache 2.0
-Version:                  0.1.0
-Date:                     9 august 2017
-IDE:                      Visual Studio 2017 Community 15.2
+Version:                  0.2.0
+Date:                     26 august 2017
+IDE:                      Visual Studio 2017 Community 15.3
 *****************************************************************************************
 
 Foreword
 ------------------------------
 Here is the latest version of a conversion from Apache MetaModel's Java code to C# 
-(.Net Core 1.1). Please notice that it is a limited subset which has neen ported ATM. 
+(.Net Core 1.1). Please notice that it is a subset which has neen ported ATM. 
 
-It compiles without errors but has not yet been tested at all (not even the Unit Tests 
-ATM). Previously I'd applied a "brute force" and "bottom up" approach. Now I've started 
-to "fill the blanks" in order to build a complete conversion of the 'Json connector'.
-This is then now more a "top down" walkthrough of the java codebase. 
-ATM I miss the System Architect skills for Apache MetaModel (even those of a seasoned 
-developer using Apache MetaModel as a solution). 
-If the codebase is big enough (29% of the 'core' package), it would be helpful if 
-the core team considers doing a code review to validate / invalidate my conversion 
-choices.
+Now the codebase is big enough (i.e. the 'engine' is ready) which allows to run the unit 
+tests (via 'MetaModel-cli-test' console app) but still a lot of validation / debug 
+pending (e.g. in JsonDataContextTest.testDocumentsOnEveryLineFile() only the first 
+Assert succeeds). 
 
-0.1.0 Release Notes 
+Previously I sais that I applied a "brute force" and "bottom up" approach. Now I 
+would say that it's more the approach seems more like porting a legacy codebase.
+
+I agree with Kasper that a rewrite with CSharp strengths and weaknesses makes more
+sense than a "1 to 1 Force Fit" from Java to CSharp. I just hope that this prototype
+may raise enough motivation to "dotnet" child project within Apache MetaModel.
+
+0.2.0 Release Notes 
 ------------------------------
-* Metrics : 
-- 120 java source files ported in C#
-  - 29% of the 'core' package of Apache MetaModel (416 java source files)
-  - 16% of the full code base (748 java source files, including implementation of 
-    connectors like 'Jdbc', 'Json', etc...)
-- 43 'helper' classes (to emulate java classes without a .Net equivalence, these classes 
-  are prefixed by 'N', e.g. (e.g. Java's 'Number' class converted to 'NNumber')).
- 
+- 'QueryPostprocessDataContext' and 'MetaModelHelper' class fully ported, no more
+  'commented out' lines of code
+- 52% of the 'core' package ported
+- Json connector has been ported
+- Unit tests are now possible to run via 'MetaModel-cli-test' project (console app)
 
-Conversion Issues
+Note
 ------------------------------
-Even with a limited subset of the java source code files (120), I've encountered a lot of  
-conversions issues, from the very straightforward (e.g. 'str.toLowerCase()' converted to
-'str.ToLower()'), to the ""equivalence craft required"" (e.g. anonymous implementation of
- interface, like in 'getComparable()' method of 'BooleanComparator' class) via 'compiles
- but untested conversion'.
-
 I've compiled the 'conversion recipes' that I've found or crafted on the way, they are 
 documented in 'doc/java2dotnet_recipes.txt').
 
